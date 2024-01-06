@@ -24,6 +24,7 @@ jobs:
         API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$API_URL")
         echo "API Response: $API_RESPONSE"
         PR_DESCRIPTION=$(echo "$API_RESPONSE" | jq --raw-output .body)
+        echo "PR_DESCRIPTION: $PR_DESCRIPTION"
         echo "::set-output name=description::$PR_DESCRIPTION"
 
     - name: Use pull request description
