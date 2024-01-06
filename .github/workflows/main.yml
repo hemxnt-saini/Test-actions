@@ -1,0 +1,47 @@
+name: Build and deploy dev images for AWS ECS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Image and Deploy ECS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+
+      - name: Extract Information from PR Description
+        id: extract-info
+        run: |
+          echo "PR Information:"
+          echo "Github Token: ${{ secrets.GITHUB_TOKEN }}"
+          echo "Github Info: $(echo '${{ toJson(github) }}' | jq -r tostring)"
+          echo "Github API URL: ${{ github.api_url }}"
+          echo "Github Repo: ${{ github.repository }}"
+          echo "Github Event Number: ${{ github.event.number }}"
+
+          # Fetch PR information using GitHub API
+          PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.number }} | jq -r .body)
+
+          # Extract Name and Version from PR description using regex
+          NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*' || true)
+          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*' || true)
+
+          # Set output variables
+          echo "::set-output name=name::$NAME"
+          echo "::set-output name=version::$VERSION"
+
+
+      - name: Display Extracted Information
+        run: |
+          echo "Extracted Information:"
+          echo "Name: ${{ steps.extract-info.outputs.name }}"
+          echo "Version: ${{ steps.extract-info.outputs.version }}"
