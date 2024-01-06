@@ -19,8 +19,8 @@ jobs:
     - name: Fetch pull request details
       id: pr
       run: |
-        API_URL="${{ github.event.repository.pulls_url }}"
-        echo "API URL: $API_URL"
+        API_URL="https://api.github.com/repos/${{ github.repository }}/pulls/1"
+        echo "API Url: $API_URL"
         API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$API_URL")
         echo "API Response: $API_RESPONSE"
         PR_DESCRIPTION=$(echo "$API_RESPONSE" | jq --raw-output .body)
