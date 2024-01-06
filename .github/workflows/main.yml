@@ -6,42 +6,22 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build Image and Deploy ECS
+  pr-description-job:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '14'
+    - name: Fetch pull request details
+      id: pr
+      run: |
+        PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+        API_URL="https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER"
+        PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$API_URL" | jq --raw-output .body)
+        echo "::set-output name=description::$PR_DESCRIPTION"
 
-      - name: Extract Information from PR Description
-        id: extract-info
-        run: |
-          echo "PR Information:"
-          echo "Github Token: ${{ secrets.GITHUB_TOKEN }}"
-          echo "Github Info: $(echo '${{ toJson(github) }}' | jq -r tostring)"
-          echo "Github API URL: ${{ github.api_url }}"
-          echo "Github Repo: ${{ github.repository }}"
-          echo "Github Event Number: ${{ github.event.number }}"
-
-          # Fetch PR information using GitHub API
-          PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.number }} | jq -r .body)
-
-          # Extract Name and Version from PR description using regex
-          NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*' || true)
-          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*' || true)
-
-          # Set output variables
-          echo "::set-output name=name::$NAME"
-          echo "::set-output name=version::$VERSION"
-
-
-      - name: Display Extracted Information
-        run: |
-          echo "Extracted Information:"
-          echo "Name: ${{ steps.extract-info.outputs.name }}"
-          echo "Version: ${{ steps.extract-info.outputs.version }}"
+    - name: Use pull request description
+      run: |
+        PR_DESCRIPTION="${{ steps.pr.outputs.description }}"
+        echo "Pull Request Description: $PR_DESCRIPTION"
