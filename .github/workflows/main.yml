@@ -27,19 +27,19 @@ jobs:
           BUGS=$(echo "$PR_BODY" | awk -v RS= '/### Bug:/ {print}' | tail -n +2 | sed '/^$/d')
           ADDITIONAL_NOTES=$(echo "$PR_BODY" | awk -v RS= '/### Additional Notes:/ {print}' | tail -n +2 | sed '/^$/d')
 
-          # Set output variables for later steps
-          echo "NAME=$NAME" >> $GITHUB_ENV
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "FEATURES=$FEATURES" >> $GITHUB_ENV
-          echo "UPDATES=$UPDATES" >> $GITHUB_ENV
-          echo "BUGS=$BUGS" >> $GITHUB_ENV
-          echo "ADDITIONAL_NOTES=$ADDITIONAL_NOTES" >> $GITHUB_ENV
+          # Set output variables
+          echo "::set-output name=name::${NAME}"
+          echo "::set-output name=version::${VERSION}"
+          echo "::set-output name=features::${FEATURES}"
+          echo "::set-output name=updates::${UPDATES}"
+          echo "::set-output name=bugs::${BUGS}"
+          echo "::set-output name=additional_notes::${ADDITIONAL_NOTES}"
 
       - name: Display extracted details
         run: |
-          echo "Name: $NAME"
-          echo "Version: $VERSION"
-          echo "Features: $FEATURES"
-          echo "Updates: $UPDATES"
-          echo "Bugs: $BUGS"
-          echo "Additional Notes: $ADDITIONAL_NOTES"
+          echo "Name: ${{ steps.extract.outputs.name }}"
+          echo "Version: ${{ steps.extract.outputs.version }}"
+          echo "Features: ${{ steps.extract.outputs.features }}"
+          echo "Updates: ${{ steps.extract.outputs.updates }}"
+          echo "Bugs: ${{ steps.extract.outputs.bugs }}"
+          echo "Additional Notes: ${{ steps.extract.outputs.additional_notes }}"
