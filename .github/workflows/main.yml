@@ -17,14 +17,8 @@ jobs:
         run: |
           PR_BODY=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.number }} | jq -r .body)            
           echo "PR Body: ${PR_BODY}"
-          
-      - name: Fetch PR details2
-        run: |
-          PR_BODY2=${{ github.event.body }}
-          echo "PR Body2: ${PR_BODY2}"
-
+      
       - name: Extract PR Details
-        id: pr_details
         run: |
           # Extracting Name and Version
           name=$(echo "$PR_BODY" | grep '**Name**' | sed 's/\*\*Name\*\*: //')
