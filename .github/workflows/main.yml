@@ -25,7 +25,7 @@ jobs:
           NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*' || true)
           VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*'|| true)
           FEATURE=$(echo "$PR_DESCRIPTION" | grep -oP 'Feature:\s*\K.*'|| true)
-          FEATURE2=$(echo "$PR_DESCRIPTION" | awk -v RS='\n\n' '/### Feature:/{gsub("\n", ", "); print $0}' | grep -oP 'Feature:\s*\K.*' || true)
+          FEATURE2=$(echo "$PR_DESCRIPTION" | awk '/### Feature:/{flag=1; next} /^###/{flag=0} flag{print}' | jq -s -c 'map(select(. != "")) | join(", ")' || true)
           UPDATE=$(echo "$PR_DESCRIPTION" | grep -oP 'Update:\s*\K.*'|| true)
           BUG=$(echo "$PR_DESCRIPTION" | grep -oP 'Bug:\s*\K.*'|| true)
           ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\K.*'|| true)
