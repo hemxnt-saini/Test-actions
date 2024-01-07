@@ -37,9 +37,8 @@ jobs:
       - name: Display Extracted Information
         run: |
           echo "Extracted Information:"
-          echo "Steps:" ${{steps}}
-          echo "Extracted Info:" ${{steps.extract-info}}
-          echo "Outputs:" ${{steps.extract-info.outputs}}
+          echo "Extracted Info: $(echo '${{ toJson(steps.extract-info) }}' | jq -r tostring)"
+          echo "Outputs: $(echo '${{ toJson(steps.extract-info.outputs) }}' | jq -r tostring)"
           echo "Name: ${{ steps.extract-info.outputs.name }}"
           echo "Version: ${{ steps.extract-info.outputs.version }}"
           echo "Feature: ${{ steps.extract-info.outputs.feature }}"
