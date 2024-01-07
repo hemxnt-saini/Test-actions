@@ -1,4 +1,4 @@
-name: Test PR Action
+name: Fetch PR Details
 
 on:
   pull_request:
@@ -13,35 +13,37 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Extract Information from PR Description
-        id: extract-info
+      - name: Fetch PR details
+        id: pr-details
         run: |
-          echo "PR Information:"
-          echo "Github Info: $(echo '${{ toJson(github) }}' | jq -r tostring)"
-          PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.number }} | jq -r .body)
-          echo "PR_DESCRIPTION: $PR_DESCRIPTION"
-          NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*' || true)
-          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*' || true)
-          FEATURE=$(echo "$PR_DESCRIPTION" | grep -oP 'Feature:\s*\K.*' || true)
-          UPDATE=$(echo "$PR_DESCRIPTION" | grep -oP 'Update:\s*\K.*' || true)
-          BUG=$(echo "$PR_DESCRIPTION" | grep -oP 'Bug:\s*\K.*' || true)
-          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\K.*' || true)
-          echo "::set-output name=name::$NAME"
-          echo "::set-output name=version::$VERSION"
-          echo "::set-output name=feature::$FEATURE"
-          echo "::set-output name=update::$UPDATE"
-          echo "::set-output name=bug::$BUG"
-          echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
+          PR_NUMBER=$(echo "${{ github.event_name }}" | jq -r '.pull_request.number')
+          PR_DETAILS=$(curl -sSL -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                       -H "Accept: application/vnd.github.v3+json" \
+                       "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}")
+          echo "::set-output name=pr-details::${PR_DETAILS}"
 
-
-      - name: Display Extracted Information
+      - name: Set environment variables
         run: |
-          echo "Extracted Information:"
-          echo "Extracted Info: $(echo '${{ toJson(steps.extract-info) }}' | jq -r tostring)"
+          PR_NAME=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.title')
+          PR_VERSION=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=\*\*Version\*\*: ).*')
+          PR_FEATURES=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Feature:\r\n)[\s\S]*?(?=\r\n\r\n### Update:)')
+          PR_UPDATES=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Update:\r\n)[\s\S]*?(?=\r\n\r\n### Bug:)')
+          PR_BUGS=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Bug:\r\n)[\s\S]*?(?=\r\n\r\n### Additional Notes:)')
+          PR_NOTES=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Additional Notes:\r\n)[\s\S]*?(?=\r\n \r\n## Issue ticket number)')
+
+          echo "PR_NAME=${PR_NAME}" >> $GITHUB_ENV
+          echo "PR_VERSION=${PR_VERSION}" >> $GITHUB_ENV
+          echo "PR_FEATURES=${PR_FEATURES}" >> $GITHUB_ENV
+          echo "PR_UPDATES=${PR_UPDATES}" >> $GITHUB_ENV
+          echo "PR_BUGS=${PR_BUGS}" >> $GITHUB_ENV
+          echo "PR_NOTES=${PR_NOTES}" >> $GITHUB_ENV
+
+      - name: Use fetched PR details
+        run: |
           echo "Outputs: $(echo '${{ toJson(steps.extract-info.outputs) }}' | jq -r tostring)"
-          echo "Name: ${{ steps.extract-info.outputs.name }}"
-          echo "Version: ${{ steps.extract-info.outputs.version }}"
-          echo "Feature: ${{ steps.extract-info.outputs.feature }}"
-          echo "Update: ${{ steps.extract-info.outputs.update }}"
-          echo "Bug: ${{ steps.extract-info.outputs.bug }}"
-          echo "Additional Notes: ${{ steps.extract-info.outputs.additional_notes }}"
+          echo "PR_NAME: ${{ env.PR_NAME }}"
+          echo "PR_VERSION: ${{ env.PR_VERSION }}"
+          echo "PR_FEATURES: ${{ env.PR_FEATURES }}"
+          echo "PR_UPDATES: ${{ env.PR_UPDATES }}"
+          echo "PR_BUGS: ${{ env.PR_BUGS }}"
+          echo "PR_NOTES: ${{ env.PR_NOTES }}"
