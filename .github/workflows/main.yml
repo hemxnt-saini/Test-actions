@@ -23,12 +23,12 @@ jobs:
           echo "Github Repo:" ${{ github.repository }}
           echo "Github Event Number:" ${{ github.event.number }}
           PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/1 | jq -r .body)
-          NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*')
-          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*')
-          FEATURE=$(echo "$PR_DESCRIPTION" | grep -oP 'Feature:\s*\K.*')
-          UPDATE=$(echo "$PR_DESCRIPTION" | grep -oP 'Update:\s*\K.*')
-          BUG=$(echo "$PR_DESCRIPTION" | grep -oP 'Bug:\s*\K.*')
-          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\K.*')
+          NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*' || true)
+          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*' || true)
+          FEATURE=$(echo "$PR_DESCRIPTION" | grep -oP 'Feature:\s*\K.*' || true)
+          UPDATE=$(echo "$PR_DESCRIPTION" | grep -oP 'Update:\s*\K.*' || true)
+          BUG=$(echo "$PR_DESCRIPTION" | grep -oP 'Bug:\s*\K.*' || true)
+          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\K.*' || true)
           echo "::set-output name=name::$NAME"
           echo "::set-output name=version::$VERSION"
           echo "::set-output name=feature::$FEATURE"
