@@ -17,7 +17,7 @@ jobs:
         id: extract-info
         run: |
           echo "Github Info: $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)"
-          PR_DESCRIPTION = $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)
+          PR_DESCRIPTION=$(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)
           echo "PR DESC: $PR_DESCRIPTION"
           NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*')
           VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*')
