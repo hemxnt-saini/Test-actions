@@ -16,7 +16,7 @@ jobs:
       - name: Extract Information from PR Description
         id: extract-info
         run: |
-          echo "Github Event:" ${{ github.event }}
+          echo "Github Info: $(echo '${{ toJson(github.event) }}' | jq -r tostring)"
           PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.number }} | jq -r .body)
           echo "PR DESC: $PR_DESCRIPTION"
           NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*')
