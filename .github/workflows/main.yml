@@ -13,43 +13,33 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Fetch PR details1
+      - name: Extract PR details
         run: |
           PR_BODY=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.number }} | jq -r .body)            
           echo "PR Body: ${PR_BODY}"
-      
-      - name: Extract PR Details
-        id: pr_details
+          # Extract Name and Version
+          NAME=$(echo "$PR_BODY" | grep '**Name**' | cut -d':' -f2 | tr -d '[:space:]')
+          VERSION=$(echo "$PR_BODY" | grep '**Version**' | cut -d':' -f2 | tr -d '[:space:]')
+
+          # Extract Features, Updates, Bugs, and Additional Notes
+          FEATURES=$(echo "$PR_BODY" | awk -v RS= '/### Feature:/ {print}' | tail -n +2 | sed '/^$/d')
+          UPDATES=$(echo "$PR_BODY" | awk -v RS= '/### Update:/ {print}' | tail -n +2 | sed '/^$/d')
+          BUGS=$(echo "$PR_BODY" | awk -v RS= '/### Bug:/ {print}' | tail -n +2 | sed '/^$/d')
+          ADDITIONAL_NOTES=$(echo "$PR_BODY" | awk -v RS= '/### Additional Notes:/ {print}' | tail -n +2 | sed '/^$/d')
+
+          # Set output variables for later steps
+          echo "NAME=$NAME" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "FEATURES=$FEATURES" >> $GITHUB_ENV
+          echo "UPDATES=$UPDATES" >> $GITHUB_ENV
+          echo "BUGS=$BUGS" >> $GITHUB_ENV
+          echo "ADDITIONAL_NOTES=$ADDITIONAL_NOTES" >> $GITHUB_ENV
+
+      - name: Display extracted details
         run: |
-          # Extracting Name and Version
-          name=$(echo "$PR_BODY" | awk -F': ' '/\*\*Name\*\*/ {print $2}')
-          version=$(echo "$PR_BODY" | awk -F': ' '/\*\*Version\*\*/ {print $2}')
-
-          # Extracting Features
-          features=$(echo "$PR_BODY" | awk '/### Feature:/,/### Update:/{if ($1 ~ /^- /) print $2}')
-
-          # Extracting Updates
-          updates=$(echo "$PR_BODY" | awk '/### Update:/,/### Bug:/{if ($1 ~ /^- /) print $2}')
-
-          # Extracting Bugs
-          bugs=$(echo "$PR_BODY" | awk '/### Bug:/,/### Additional Notes:/{if ($1 ~ /^- /) print $2}')
-
-          # Extracting Additional Notes
-          additional_notes=$(echo "$PR_BODY" | awk '/### Additional Notes:/,/## Issue ticket number and link/{if ($1 ~ /^- /) print $2}')
-
-          # Set output variables
-          echo "::set-output name=name::${name}"
-          echo "::set-output name=version::${version}"
-          echo "::set-output name=features::${features}"
-          echo "::set-output name=updates::${updates}"
-          echo "::set-output name=bugs::${bugs}"
-          echo "::set-output name=additional_notes::${additional_notes}"
-
-      - name: Print PR Details
-        run: |
-          echo "Name: ${{ steps.pr_details.outputs.name }}"
-          echo "Version: ${{ steps.pr_details.outputs.version }}"
-          echo "Features: ${{ steps.pr_details.outputs.features }}"
-          echo "Updates: ${{ steps.pr_details.outputs.updates }}"
-          echo "Bugs: ${{ steps.pr_details.outputs.bugs }}"
-          echo "Additional Notes: ${{ steps.pr_details.outputs.additional_notes }}"
+          echo "Name: $NAME"
+          echo "Version: $VERSION"
+          echo "Features: $FEATURES"
+          echo "Updates: $UPDATES"
+          echo "Bugs: $BUGS"
+          echo "Additional Notes: $ADDITIONAL_NOTES"
