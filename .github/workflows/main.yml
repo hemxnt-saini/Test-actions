@@ -16,10 +16,8 @@ jobs:
       - name: Fetch PR details
         id: pr-details
         run: |
-          PR_NUMBER=$(echo "${{ github.event_name }}" | jq -r '.pull_request.number')
-          PR_DETAILS=$(curl -sSL -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                       -H "Accept: application/vnd.github.v3+json" \
-                       "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}")
+          PR_DETAILS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.number }} | jq -r .body)            
+          echo "PR Data: ${PR_DETAILS}"
           echo "::set-output name=pr-details::${PR_DETAILS}"
 
       - name: Set environment variables
