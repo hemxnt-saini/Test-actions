@@ -1,4 +1,4 @@
-name: Build and deploy dev images for AWS ECS
+name: Test PR Action
 
 on:
   push:
@@ -6,28 +6,45 @@ on:
       - main
 
 jobs:
-  pr-description-job:
+  build:
+    name: Build Image and Deploy ECS
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v4
 
-    - name: Print event payload
-      run: cat $GITHUB_EVENT_PATH
+      - name: Extract Information from PR Description
+        id: extract-info
+        run: |
+          echo "PR Information:"
+          echo "Github Token:" ${{ secrets.GITHUB_TOKEN }}
+          echo "Github Info:" ${{ github }}
+          echo "Github API URL:" ${{ github.api_url }}
+          echo "Github Repo:" ${{ github.repository }}
+          echo "Github Event Number:" ${{ github.event.number }}
+          PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/1 | jq -r .body)
+          NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*')
+          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*')
+          FEATURE=$(echo "$PR_DESCRIPTION" | grep -oP 'Feature:\s*\K.*')
+          UPDATE=$(echo "$PR_DESCRIPTION" | grep -oP 'Update:\s*\K.*')
+          BUG=$(echo "$PR_DESCRIPTION" | grep -oP 'Bug:\s*\K.*')
+          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\K.*')
+          echo "::set-output name=name::$NAME"
+          echo "::set-output name=version::$VERSION"
+          echo "::set-output name=feature::$FEATURE"
+          echo "::set-output name=update::$UPDATE"
+          echo "::set-output name=bug::$BUG"
+          echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
 
-    - name: Fetch pull request details
-      id: pr
-      run: |
-        API_URL="https://api.github.com/repos/${{ github.repository }}/pulls/1"
-        echo "API Url: $API_URL"
-        API_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$API_URL")
-        echo "API Response: $API_RESPONSE"
-        PR_DESCRIPTION=$(echo "$API_RESPONSE" | jq --raw-output .body)
-        echo "PR_DESCRIPTION: $PR_DESCRIPTION"
-        echo "::set-output name=description::$PR_DESCRIPTION"
-
-    - name: Use pull request description
-      run: |
-        PR_DESCRIPTION="${{ steps.pr.outputs.description }}"
-        echo "Pull Request Description: $PR_DESCRIPTION"
+      - name: Display Extracted Information
+        run: |
+          echo "Extracted Information:"
+          echo "Steps:" ${{steps}}
+          echo "Extracted Info:" ${{steps.extract-info}}
+          echo "Outputs:" ${{steps.extract-info.outputs}}
+          echo "Name: ${{ steps.extract-info.outputs.name }}"
+          echo "Version: ${{ steps.extract-info.outputs.version }}"
+          echo "Feature: ${{ steps.extract-info.outputs.feature }}"
+          echo "Update: ${{ steps.extract-info.outputs.update }}"
+          echo "Bug: ${{ steps.extract-info.outputs.bug }}"
+          echo "Additional Notes: ${{ steps.extract-info.outputs.additional_notes }}"
