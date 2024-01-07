@@ -16,25 +16,19 @@ jobs:
       - name: Extract Information from PR Description
         id: extract-info
         run: |
-          echo "PR Information:"
-          echo "Github Token:" ${{ secrets.GITHUB_TOKEN }}
-          echo "Github Info:" ${{ github }}
-          echo "Github API URL:" ${{ github.api_url }}
-          echo "Github Repo:" ${{ github.repository }}
-          echo "Github Event Number:" ${{ github.event.number }}
-          PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/1 | jq -r .body)
-          NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*' || true)
-          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*' || true)
-          FEATURE=$(echo "$PR_DESCRIPTION" | grep -oP 'Feature:\s*\K.*' || true)
-          UPDATE=$(echo "$PR_DESCRIPTION" | grep -oP 'Update:\s*\K.*' || true)
-          BUG=$(echo "$PR_DESCRIPTION" | grep -oP 'Bug:\s*\K.*' || true)
-          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\K.*' || true)
-          echo "::set-output name=name::$NAME"
-          echo "::set-output name=version::$VERSION"
-          echo "::set-output name=feature::$FEATURE"
-          echo "::set-output name=update::$UPDATE"
-          echo "::set-output name=bug::$BUG"
-          echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
+          PR_NAME=$(echo "${{ github.event.pull_request.body }}" | grep -oP '(?<=\*\*Name:\*\* ).*')
+          PR_VERSION=$(echo "${{ github.event.pull_request.body }}" | grep -oP '(?<=\*\*Version:\*\* ).*')
+          PR_FEATURES=$(echo "${{ github.event.pull_request.body }}" | grep -oP '(?<=### Feature:\n)(.*\n)*' | sed '/^$/d')
+          PR_BUGS=$(echo "${{ github.event.pull_request.body }}" | grep -oP '(?<=### Bug:\n)(.*\n)*' | sed '/^$/d')
+          PR_NOTES=$(echo "${{ github.event.pull_request.body }}" | grep -oP '(?<=### Additional Notes:\n)(.*\n)*' | sed '/^$/d')
+          PR_ISSUE_LINK=$(echo "${{ github.event.pull_request.body }}" | grep -oP '(?<=## Issue ticket number and link\n)(.*\n)*' | sed '/^$/d')
+
+          echo "PR_NAME=$PR_NAME"
+          echo "PR_VERSION=$PR_VERSION"
+          echo "PR_FEATURES=$PR_FEATURES"
+          echo "PR_BUGS=$PR_BUGS"
+          echo "PR_NOTES=$PR_NOTES"
+          echo "PR_ISSUE_LINK=$PR_ISSUE_LINK"
 
       - name: Display Extracted Information
         run: |
