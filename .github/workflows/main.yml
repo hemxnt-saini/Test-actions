@@ -13,37 +13,31 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         
-      - name: Extract PR Details
-        id: extract_details
+      - name: Extract Information from PR Description
+        id: extract-info
         run: |
-          # Fetch the PR_BODY from the context
-          PR_BODY=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.number }} | jq -r .body)            
-          echo "PR Body: ${PR_BODY}"
-          
-          # Extract Name and Version using regular expressions
-          NAME=$(echo "$PR_BODY" | grep -oP '(?<=\*\*Name\*\*: ).*')
-          VERSION=$(echo "$PR_BODY" | grep -oP '(?<=\*\*Version\*\*: ).*')
+          echo "Github Event:" ${{ github.event }}
+          PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.number }} | jq -r .body)
+          echo "PR DESC: $PR_DESCRIPTION"
+          NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*')
+          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*')
+          FEATURE=$(echo "$PR_DESCRIPTION" | grep -oP 'Feature:\s*\K.*')
+          UPDATE=$(echo "$PR_DESCRIPTION" | grep -oP 'Update:\s*\K.*')
+          BUG=$(echo "$PR_DESCRIPTION" | grep -oP 'Bug:\s*\K.*')
+          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\K.*')
+          echo "::set-output name=name::$NAME"
+          echo "::set-output name=version::$VERSION"
+          echo "::set-output name=feature::$FEATURE"
+          echo "::set-output name=update::$UPDATE"
+          echo "::set-output name=bug::$BUG"
+          echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
 
-          # Extract Features, Updates, Bugs, and Additional Notes using regular expressions
-          FEATURES=$(echo "$PR_BODY" | grep -oP '(?<=### Feature:\n)(.*?)(?=\n\n)')
-          UPDATES=$(echo "$PR_BODY" | grep -oP '(?<=### Update:\n)(.*?)(?=\n\n)')
-          BUGS=$(echo "$PR_BODY" | grep -oP '(?<=### Bug:\n)(.*?)(?=\n\n)')
-          ADDITIONAL_NOTES=$(echo "$PR_BODY" | grep -oP '(?<=### Additional Notes:\n)(.*?)(?=\n\n)')
-
-          # Set the outputs for use in subsequent steps
-          echo "::set-output name=NAME::$NAME"
-          echo "::set-output name=VERSION::$VERSION"
-          echo "::set-output name=FEATURES::$FEATURES"
-          echo "::set-output name=UPDATES::$UPDATES"
-          echo "::set-output name=BUGS::$BUGS"
-          echo "::set-output name=ADDITIONAL_NOTES::$ADDITIONAL_NOTES"
-
-      - name: Use Extracted Details
+      - name: Display Extracted Information
         run: |
-          # Access the extracted details using outputs
-          echo "Name: ${{ steps.extract_details.outputs.NAME }}"
-          echo "Version: ${{ steps.extract_details.outputs.VERSION }}"
-          echo "Features: ${{ steps.extract_details.outputs.FEATURES }}"
-          echo "Updates: ${{ steps.extract_details.outputs.UPDATES }}"
-          echo "Bugs: ${{ steps.extract_details.outputs.BUGS }}"
-          echo "Additional Notes: ${{ steps.extract_details.outputs.ADDITIONAL_NOTES }}"
+          echo "Outputs:" ${{steps.extract-info.outputs}}
+          echo "Name: ${{ steps.extract-info.outputs.name }}"
+          echo "Version: ${{ steps.extract-info.outputs.version }}"
+          echo "Feature: ${{ steps.extract-info.outputs.feature }}"
+          echo "Update: ${{ steps.extract-info.outputs.update }}"
+          echo "Bug: ${{ steps.extract-info.outputs.bug }}"
+          echo "Additional Notes: ${{ steps.extract-info.outputs.additional_notes }}"
