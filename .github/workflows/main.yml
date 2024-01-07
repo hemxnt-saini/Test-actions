@@ -1,9 +1,9 @@
 name: Test PR Action
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types:
+      - closed
 
 jobs:
   build:
@@ -24,7 +24,7 @@ jobs:
           echo "Github Event Number: ${{ github.event.number }}"
 
           # Fetch PR information using GitHub API
-          PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/2 | jq -r .body)
+          PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.number }} | jq -r .body)
           echo "PR_DESCRIPTION: $PR_DESCRIPTION"
 
           NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*' || true)
