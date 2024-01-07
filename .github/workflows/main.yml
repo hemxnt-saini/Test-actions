@@ -22,12 +22,12 @@ jobs:
 
       - name: Set environment variables
         run: |
-          PR_NAME=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.title')
-          PR_VERSION=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=\*\*Version\*\*: ).*')
-          PR_FEATURES=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Feature:\r\n)[\s\S]*?(?=\r\n\r\n### Update:)')
-          PR_UPDATES=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Update:\r\n)[\s\S]*?(?=\r\n\r\n### Bug:)')
-          PR_BUGS=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Bug:\r\n)[\s\S]*?(?=\r\n\r\n### Additional Notes:)')
-          PR_NOTES=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Additional Notes:\r\n)[\s\S]*?(?=\r\n \r\n## Issue ticket number)')
+          PR_NAME=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=\*\*Name\*\*: ).*' || true)
+          PR_VERSION=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=\*\*Version\*\*: ).*' || true)
+          PR_FEATURES=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Feature:\r\n)[\s\S]*?(?=\r\n\r\n### Update:)' || true)
+          PR_UPDATES=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Update:\r\n)[\s\S]*?(?=\r\n\r\n### Bug:)' || true)
+          PR_BUGS=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Bug:\r\n)[\s\S]*?(?=\r\n\r\n### Additional Notes:)' || true)
+          PR_NOTES=$(echo "${{ steps.pr-details.outputs.pr-details }}" | jq -r '.body' | grep -oP '(?<=### Additional Notes:\r\n)[\s\S]*?(?=\r\n \r\n## Issue ticket number)' || true)
 
           echo "PR_NAME=${PR_NAME}" >> $GITHUB_ENV
           echo "PR_VERSION=${PR_VERSION}" >> $GITHUB_ENV
