@@ -1,9 +1,9 @@
-name: Build and deploy dev images for AWS ECS
+name: Test PR Action
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types:
+      - closed
 
 jobs:
   build:
@@ -13,35 +13,35 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '14'
-
       - name: Extract Information from PR Description
         id: extract-info
         run: |
           echo "PR Information:"
-          echo "Github Token: ${{ secrets.GITHUB_TOKEN }}"
           echo "Github Info: $(echo '${{ toJson(github) }}' | jq -r tostring)"
-          echo "Github API URL: ${{ github.api_url }}"
-          echo "Github Repo: ${{ github.repository }}"
-          echo "Github Event Number: ${{ github.event.number }}"
-
-          # Fetch PR information using GitHub API
           PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.number }} | jq -r .body)
-
-          # Extract Name and Version from PR description using regex
+          echo "PR_DESCRIPTION: $PR_DESCRIPTION"
           NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*' || true)
           VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*' || true)
-
-          # Set output variables
+          FEATURE=$(echo "$PR_DESCRIPTION" | grep -oP 'Feature:\s*\K.*' || true)
+          UPDATE=$(echo "$PR_DESCRIPTION" | grep -oP 'Update:\s*\K.*' || true)
+          BUG=$(echo "$PR_DESCRIPTION" | grep -oP 'Bug:\s*\K.*' || true)
+          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\K.*' || true)
           echo "::set-output name=name::$NAME"
           echo "::set-output name=version::$VERSION"
+          echo "::set-output name=feature::$FEATURE"
+          echo "::set-output name=update::$UPDATE"
+          echo "::set-output name=bug::$BUG"
+          echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
 
 
       - name: Display Extracted Information
         run: |
           echo "Extracted Information:"
+          echo "Extracted Info: $(echo '${{ toJson(steps.extract-info) }}' | jq -r tostring)"
+          echo "Outputs: $(echo '${{ toJson(steps.extract-info.outputs) }}' | jq -r tostring)"
           echo "Name: ${{ steps.extract-info.outputs.name }}"
           echo "Version: ${{ steps.extract-info.outputs.version }}"
+          echo "Feature: ${{ steps.extract-info.outputs.feature }}"
+          echo "Update: ${{ steps.extract-info.outputs.update }}"
+          echo "Bug: ${{ steps.extract-info.outputs.bug }}"
+          echo "Additional Notes: ${{ steps.extract-info.outputs.additional_notes }}"
