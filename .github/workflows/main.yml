@@ -15,24 +15,23 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         
-      - name: Extract Information from PR Description
-        id: extract-info
+      - name: Extract Changes from Pull Request Description
         run: |
-          echo "PR DESC: $PR_DESCRIPTION"
-          echo "Github Info: $(echo '${{ toJson(github.event) }}' | jq -r tostring)"
-          TITLE=$(echo "$PR_DESCRIPTION" | grep -oP '\*\*Title:\*\* \K.*' || true)
-          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP '\*\*Version:\*\* \K.*' || true)
-          CHANGES=$(git log --pretty=format:"- %s" ${{ github.event.before }}..${{ github.sha }})
-          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP '\*\*Additional Notes:\*\* \K.*' || true)
-          
-          echo "title=$TITLE" >> $GITHUB_ENV
-          echo "version=$VERSION" >> $GITHUB_ENV
-          echo "changes=$CHANGES" >> $GITHUB_ENV
-          echo "additional_notes=$ADDITIONAL_NOTES" >> $GITHUB_ENV
+          # Get the pull request description
+          PR_DESCRIPTION=$(curl -sH "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
+              | jq -r '.body')
 
-        env:
-          PR_DESCRIPTION: ${{ github.event.pull_request.body }}
-          
-      - name: Display Extracted Information
+          echo "Github Info: $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)"
+          echo "PR DESC: $PR_DESCRIPTION"
+
+          # Extract the changes using a regular expression
+          CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP '\*\*Changes:\*\*\s*[\n\s\S]*?(?=\*\*)' | grep -oP '-\s*\K.+')
+
+          # Store the changes in an environment variable
+          echo "CHANGES=$CHANGES" >> $GITHUB_ENV
+
+      - name: Display Changes
         run: |
-          echo "Outputs: Title=${{ env.title }} Version=${{ env.version }} Changes=${{ env.changes }} Additional Notes=${{ env.additional_notes }}"
+          # Display the changes stored in the environment variable
+          echo "Changes: $CHANGES"
