@@ -24,7 +24,7 @@ jobs:
           echo "PR_BODY=$PR_BODY"
           
           CHANGES=$(echo "$PR_BODY" | sed -n -e '/Changes:/,/Additional Notes:/p' | grep '^-' | sed 's/^- //')
-          echo "Changes=$CHANGES_STRING"
+          echo "Changes=$CHANGES"
           
           CHANGES_STRING=$(echo "$CHANGES" | tr '\n' ',' | sed 's/,$//')
           echo "Changes=$CHANGES_STRING"
