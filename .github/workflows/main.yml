@@ -32,8 +32,20 @@ jobs:
           ADDITIONAL_NOTES_STRING=$(echo "$ADDITIONAL_NOTES" | tr '\n' ',' | sed 's/,$//')
           echo "Additional Notes=$ADDITIONAL_NOTES_STRING"
 
+          echo "title=$TITLE" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_ENV
+          echo "changes=$CHANGES_STRING" >> $GITHUB_ENV
+          echo "additional_notes=$ADDITIONAL_NOTES_STRING" >> $GITHUB_ENV
+
           
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
+
+      - name: Display Extracted Information
+        run: |
+          echo "Title=${{ env.title }}"
+          echo "Title=${{ env.version }}"
+          echo "Title=${{ env.changes }}"
+          echo "Title=${{ env.additional_notes }}"
        
       
