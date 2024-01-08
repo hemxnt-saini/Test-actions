@@ -45,17 +45,17 @@ jobs:
         with:
           status: ${{ job.status }}
           message: |
-            New Deployment: ${{ env.title }} :rocket:
+            New Deployment: ${{ env.title }}:rocket:
             
             Environment: Main
             
             Version: ${{ env.version }}
             
             Key Features/Changes: 
-              ${{ env.changes}}
-
-            Key Features/Changes: 
-              ${{ env.additional_notes}}
+              ${{ env.changes }}
+            
+            Additional Notes: 
+              ${{ env.additional_notes }}
           channel: '#test-deployments'
        
       
