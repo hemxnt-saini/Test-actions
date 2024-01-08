@@ -22,7 +22,7 @@ jobs:
           TITLE=$(echo "$PR_DESCRIPTION" | grep -oP '\*\*Title:\*\* \K.*' || true)
           VERSION=$(echo "$PR_DESCRIPTION" | grep -oP '\*\*Version:\*\* \K.*' || true)
           # Extract changes as an array
-          IFS=$'\n' CHANGES=($(echo "${{ github.event.pull_request.body }}" | grep -oP '\*\*Changes:\*\* \K.*' | grep -oP '- .*'))
+          IFS=$'\n' CHANGES=($(echo "${{ github.event.pull_request.body }}" | awk -v RS='' '/\*\*Changes:\*\* \K(.|\n)*?(\*\*|$)/' | grep -oP '- .*'))
           echo "Changes: ${CHANGES[@]}"
           ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP '\*\*Additional Notes:\*\* \K.*' || true)
           echo "title=$TITLE" >> $GITHUB_ENV
