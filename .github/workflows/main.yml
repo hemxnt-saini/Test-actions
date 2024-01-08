@@ -18,10 +18,10 @@ jobs:
       - name: Extract PR information
         id: extract_info
         run: |
-          title=$(echo "$PR_BODY" | python -c "import sys, re; match = re.search(r'^\*\*Title:\*\* (.*?)(\n|$)', sys.stdin.read(), re.MULTILINE); print(match.group(1) if match else '')")
-          version=$(echo "$PR_BODY" | python -c "import sys, re; match = re.search(r'^\*\*Version:\*\* (.*?)(\n|$)', sys.stdin.read(), re.MULTILINE); print(match.group(1) if match else '')")
-          changes=$(echo "$PR_BODY" | python -c "import sys, re; matches = re.findall(r'^\*\*Changes:\*\*\s*(.*?)(\n|$)', sys.stdin.read(), re.MULTILINE); print(','.join(matches) if matches else '')")
-          additional_notes=$(echo "$PR_BODY" | python -c "import sys, re; match = re.search(r'^\*\*Additional Notes:\*\* (.*?)(\n|$)', sys.stdin.read(), re.MULTILINE); print(match.group(1) if match else '')")
+          title=$(echo "$PR_BODY" | grep -m1 '^**Title:**' | sed -e 's/^**Title:** //')
+          version=$(echo "$PR_BODY" | grep -m1 '^**Version:**' | sed -e 's/^**Version:** //')
+          changes=$(echo "$PR_BODY" | awk '/^**Changes:**/{flag=1; next} /^**/{flag=0} flag{print "- " $2}' | sed '/^$/d')
+          additional_notes=$(echo "$PR_BODY" | grep -m1 '^**Additional Notes:**' | sed -e 's/^**Additional Notes:** //')
         
           echo "Raw PR Body: $PR_BODY"
           echo "Extracted Title: '$title'"
@@ -35,6 +35,7 @@ jobs:
           echo "::set-output name=additional_notes::$additional_notes"
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
+
 
       - name: Display formatted information
         run: |
