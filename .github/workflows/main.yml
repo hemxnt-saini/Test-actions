@@ -15,7 +15,7 @@ jobs:
     - name: Fetch Changes
       run: |
         PR_BODY="**Title:** Test Deployment\r\n\r\n**Version:** Test Version\r\n\r\n**Changes:** \r\n- Test change1\r\n- Test change2\r\n\r\n**Additional Notes:** Test Additional Notes"
-        changes_section=$(echo "$PR_BODY" | grep -A 3 '^Changes:$' | tail -n +2)
+        changes_section=$(echo "$PR_BODY" | grep -A 3 '^Changes:$' | tail -n +2 | sed ':a;N;$!ba;s/\n/\\n/g')
         echo "changes_section=$changes_section"
         changes_lines=$(echo "$changes_section" | grep -v '^$' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
         echo "changes_lines=$changes_lines"
