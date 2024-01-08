@@ -18,11 +18,11 @@ jobs:
       - name: Extract PR information
         id: extract_info
         run: |
-          title=$(echo "$PR_BODY" | perl -0777 -ne 'print $1 if /^\*\*Title:\*\* (.*?)(\n|$)/m')
-          version=$(echo "$PR_BODY" | perl -0777 -ne 'print $1 if /^\*\*Version:\*\* (.*?)(\n|$)/m')
-          changes=$(echo "$PR_BODY" | perl -0777 -ne 'print join(",", $1 =~ /^\*\*Changes:\*\*\s*(.*?)(\n|$)/mg) if /^\*\*Changes:\*\*\s*(.*?)(\n|$)/m')
-          additional_notes=$(echo "$PR_BODY" | perl -0777 -ne 'print $1 if /^\*\*Additional Notes:\*\* (.*?)(\n|$)/m')
-          
+          title=$(echo "$PR_BODY" | python -c "import sys, re; print(re.search(r'^\*\*Title:\*\* (.*?)(\n|$)', sys.stdin.read(), re.MULTILINE).group(1) if re.search(r'^\*\*Title:\*\* (.*?)(\n|$)', sys.stdin.read(), re.MULTILINE) else '')")
+          version=$(echo "$PR_BODY" | python -c "import sys, re; print(re.search(r'^\*\*Version:\*\* (.*?)(\n|$)', sys.stdin.read(), re.MULTILINE).group(1) if re.search(r'^\*\*Version:\*\* (.*?)(\n|$)', sys.stdin.read(), re.MULTILINE) else '')")
+          changes=$(echo "$PR_BODY" | python -c "import sys, re; print(','.join(re.findall(r'^\*\*Changes:\*\*\s*(.*?)(\n|$)', sys.stdin.read(), re.MULTILINE)) if re.findall(r'^\*\*Changes:\*\*\s*(.*?)(\n|$)', sys.stdin.read(), re.MULTILINE) else '')")
+          additional_notes=$(echo "$PR_BODY" | python -c "import sys, re; print(re.search(r'^\*\*Additional Notes:\*\* (.*?)(\n|$)', sys.stdin.read(), re.MULTILINE).group(1) if re.search(r'^\*\*Additional Notes:\*\* (.*?)(\n|$)', sys.stdin.read(), re.MULTILINE) else '')")
+        
           echo "Raw PR Body: $PR_BODY"
           echo "Extracted Title: '$title'"
           echo "Extracted Version: '$version'"
@@ -35,6 +35,7 @@ jobs:
           echo "::set-output name=additional_notes::$additional_notes"
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
+
 
 
       - name: Display formatted information
