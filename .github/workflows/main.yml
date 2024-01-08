@@ -15,23 +15,26 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         
-      - name: Extract Changes from Pull Request Description
+      - name: Extract PR Info
+        id: extract_info
         run: |
-          # Get the pull request description
-          PR_DESCRIPTION=$(curl -sH "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
-              | jq -r '.body')
+          PR_DESCRIPTION=$(curl -sH "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                           "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" | \
+                           jq -r '.body')
+          
+          echo "Pr Desc: $PR_DESCRIPTION"
+          TITLE=$(echo "$PR_DESCRIPTION" | grep -oP '(?<=\*\*Title:\*\* ).*' | head -n 1 || true)
+          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP '(?<=\*\*Version:\*\* ).*' | head -n 1 || true)
+          CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP '(?<=\*\*Changes:\*\* ).*' | grep -oP '(?<=- ).*' | tr '\n' ',' | sed 's/,$//' || true)
 
-          echo "Github Info: $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)"
-          echo "PR DESC: $PR_DESCRIPTION"
+          echo "Title=$TITLE"
+          echo "Version=$VERSION"
+          echo "Changes=$CHANGES"
 
-          # Extract the changes using a regular expression
-          CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP '\*\*Changes:\*\*\s*[\n\s\S]*?(?=\*\*)' | grep -oP '-\s*\K.+')
+        shell: bash
 
-          # Store the changes in an environment variable
+      - name: Store PR Info
+        run: |
+          echo "TITLE=$PR_TITLE" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "CHANGES=$CHANGES" >> $GITHUB_ENV
-
-      - name: Display Changes
-        run: |
-          # Display the changes stored in the environment variable
-          echo "Changes: $CHANGES"
