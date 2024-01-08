@@ -53,12 +53,6 @@ jobs:
             Version: ${{ env.version }}
             
             Key Features/Changes: 
-              ${{ join(split(env.changes, ','), '\n* ') }}
-            
-            Additional Notes: 
-              ${{ join(split(env.additional_notes, ','), '\n* ') }}
-
-            Key Features/Changes: 
               ${{ env.changes}}
 
             Key Features/Changes: 
