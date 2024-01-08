@@ -1,5 +1,8 @@
 name: Build and deploy dev images for AWS ECS
 
+env:
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
 on:
   pull_request:
     types:
