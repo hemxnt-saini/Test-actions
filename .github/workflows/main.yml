@@ -37,11 +37,11 @@ jobs:
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
 
-      - name: Display Extracted Information
-        run: |
-          echo "Title=${{ env.title }}"
-          echo "Version=${{ env.version }}"
-          echo "Changes=${{ env.changes }}"
-          echo "Additional Notes=${{ env.additional_notes }}"
+      - name: Slack - GitHub Actions Slack integration
+        uses: act10ns/slack@v2.0.0
+        with:
+          status: ${{ job.status }}
+          message:
+            'Test Message'
        
       
