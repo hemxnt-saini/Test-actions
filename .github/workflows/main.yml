@@ -21,19 +21,16 @@ jobs:
           echo "VERSION=$VERSION"
           
           PR_BODY=${PR_BODY//\*/}
-          echo "PR_BODY=$PR_BODY"
-          
           PR_BODY=${PR_BODY//\\r/}
-          echo "PR_BODY=$PR_BODY"
-          
           PR_BODY=${PR_BODY//\\n/}
-          echo "PR_BODY=$PR_BODY"
-          
+
           CHANGES=$(echo "$PR_BODY" | sed -n -e '/Changes:/,/Additional Notes:/p' | grep '^-' | sed 's/^- //')
-          echo "Changes=$CHANGES"
-          
-          CHANGES_STRING=$(echo "$CHANGES" | tr -d '\n' | sed 's/,/, /g')
+          CHANGES_STRING=$(echo "$CHANGES" | tr '\n' ',' | sed 's/,$//')
           echo "Changes=$CHANGES_STRING"
+
+          ADDITIONAL_NOTES=$(echo "$PR_BODY" | sed -n -e '/Additional Notes:/,/Issue ticket number and link/p' | grep '^-' | sed 's/^- //')
+          ADDITIONAL_NOTES_STRING=$(echo "$ADDITIONAL_NOTES" | tr '\n' ',' | sed 's/,$//')
+          echo "Additional Notes=$ADDITIONAL_NOTES_STRING"
 
           
         env:
