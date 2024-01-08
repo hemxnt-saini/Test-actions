@@ -18,5 +18,9 @@ jobs:
           PR_BODY_NO_NEWLINE=$(echo -e "$PR_BODY" | tr -d '\r\n')
           echo "PR_BODY_NO_NEWLINE=$PR_BODY_NO_NEWLINE"
 
-          CHANGES=$(echo "$PR_BODY_NO_NEWLINE" | awk -F '**Changes:** ' '{print $2}' | awk -F '**Additional Notes:**' '{print $1}' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/\s*,\s*/,/g')
+          PR_BODY_NO_ASTRICK=$(echo -e "$PR_BODY" | tr -d '*')
+          echo "PR_BODY_NO_ASTRICK=$PR_BODY_NO_ASTRICK"
+
+          CHANGES=$(echo "$PR_BODY" | sed -n '/Changes:/,/\Additional Notes:/p' | sed '1d;$d')
+          CHANGES=$(echo "$CHANGES" | sed ':a;N;$!ba;s/\n/, /g')
           echo "Changes=$CHANGES"
