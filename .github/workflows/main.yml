@@ -19,7 +19,7 @@ jobs:
       - name: Extract Information from PR Description
         id: extract-info
         run: |
-          echo "Github Info: $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)"
+          echo "Github Info: $(echo '${{ toJson(github.event.pull_request) }}' | jq -r tostring)"
           PR_DESCRIPTION=$(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)
           echo "PR DESC: $PR_DESCRIPTION"
           NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*' || true)
