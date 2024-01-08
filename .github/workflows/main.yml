@@ -16,10 +16,13 @@ jobs:
         run: |
           PR_BODY="**Title:** Test Deployment\r\n\r\n**Version:** Test Version\r\n\r\n**Changes:** \r\n- Test change1\r\n- Test change2\r\n\r\n**Additional Notes:** Test Additional Notes"
           
-          CLEAN_BODY=$(echo "$PR_BODY" | tr -d '*\r\n')
-          echo "CLEAN_BODY=$CLEAN_BODY"
+          CLEAN_BODY1=$(echo "$PR_BODY" | tr -d '\r\n')
+          echo "CLEAN_BODY1=$CLEAN_BODY1"
+
+          CLEAN_BODY2=$(echo "$CLEAN_BODY1" | tr -d '*')
+          echo "CLEAN_BODY2=$CLEAN_BODY2"
           
-          CHANGES_STRING=$(echo "$CLEAN_BODY" | grep -oP '(?<=- ).*')
+          CHANGES_STRING=$(echo "$CLEAN_BODY2" | grep -oP '(?<=- ).*')
           echo "CHANGES_STRING=$CHANGES_STRING"
           
           CHANGES=$(echo "$CHANGES_STRING" | paste -sd "," -)
