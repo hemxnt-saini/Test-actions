@@ -42,7 +42,6 @@ jobs:
 
       - name: Slack - GitHub Actions Slack integration
         uses: act10ns/slack@v2.0.0
-        if: github.event.pull_request.merged == true
         with:
           status: ${{ job.status }}
           message: |
