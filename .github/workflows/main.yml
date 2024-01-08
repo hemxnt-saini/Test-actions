@@ -15,15 +15,12 @@ jobs:
       - name: Extract Changes
         run: |
           PR_BODY="**Title:** Test Deployment\r\n\r\n**Version:** Test Version\r\n\r\n**Changes:** \r\n- Test change1\r\n- Test change2\r\n\r\n**Additional Notes:** Test Additional Notes"
-
-          PR_BODY_NO_ASTERISK=$(echo "$PR_BODY" | tr -d '*')
-          echo "PR_BODY_NO_ASTERISK=$PR_BODY_NO_ASTERISK"
-
-          PR_BODY_NO_NEWLINE=$(echo "$PR_BODY_NO_ASTERISK" | tr -d '\r\n')
-          echo "PR_BODY_NO_NEWLINE=$PR_BODY_NO_NEWLINE"
-
-          CHANGES_STRING=$(echo "$PR_BODY_NO_NEWLINE" | grep -o '\- [^"]*')
+          
+          CLEAN_BODY=$(echo "$PR_BODY" | tr -d '*\r\n')
+          echo "CLEAN_BODY=$CLEAN_BODY"
+          
+          CHANGES_STRING=$(echo "$CLEAN_BODY" | grep -oP '(?<=- ).*')
           echo "CHANGES_STRING=$CHANGES_STRING"
-
-          CHANGES=$(echo "$CHANGES_STRING" | sed ':a;N;$!ba;s/\n/, /g')
+          
+          CHANGES=$(echo "$CHANGES_STRING" | paste -sd "," -)
           echo "Changes=$CHANGES"
