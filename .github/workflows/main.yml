@@ -20,7 +20,7 @@ jobs:
         run: |
           title=$(echo "$PR_BODY" | perl -0777 -ne 'print $1 if /^\*\*Title:\*\* (.*?)(\n|$)/m')
           version=$(echo "$PR_BODY" | perl -0777 -ne 'print $1 if /^\*\*Version:\*\* (.*?)(\n|$)/m')
-          changes=$(echo "$PR_BODY" | perl -0777 -ne 'print join(",", $1 =~ /^\*\*Changes:\*\* (.*?)(\n|$)/mg) if /^\*\*Changes:\*\* (.*?)(\n|$)/m')
+          changes=$(echo "$PR_BODY" | perl -0777 -ne 'print join(",", $1 =~ /^\*\*Changes:\*\*\s*(.*?)(\n|$)/mg) if /^\*\*Changes:\*\*\s*(.*?)(\n|$)/m')
           additional_notes=$(echo "$PR_BODY" | perl -0777 -ne 'print $1 if /^\*\*Additional Notes:\*\* (.*?)(\n|$)/m')
           
           echo "Raw PR Body: $PR_BODY"
@@ -35,6 +35,7 @@ jobs:
           echo "::set-output name=additional_notes::$additional_notes"
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
+
 
       - name: Display formatted information
         run: |
