@@ -14,6 +14,12 @@ jobs:
     steps:
       - name: Extract Changes
         run: |
+          TITLE=$(echo "$PR_BODY" | grep -oP '\*\*Title:\*\* \K.*' || true)
+          echo "TITLE=$TITLE"
+          
+          VERSION=$(echo "$PR_BODY" | grep -oP '\*\*Version:\*\* \K.*' || true)
+          echo "VERSION=$VERSION"
+          
           PR_BODY=${PR_BODY//\*/}
           echo "PR_BODY=$PR_BODY"
           
@@ -26,8 +32,9 @@ jobs:
           CHANGES=$(echo "$PR_BODY" | sed -n -e '/Changes:/,/Additional Notes:/p' | grep '^-' | sed 's/^- //')
           echo "Changes=$CHANGES"
           
-          CHANGES_STRING=$(echo "$CHANGES" | tr '\n' ',' | sed 's/,$//')
+          CHANGES_STRING=$(echo "$CHANGES" | tr -d '\n' | sed 's/,/, /g')
           echo "Changes=$CHANGES_STRING"
+
           
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
