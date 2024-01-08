@@ -42,10 +42,27 @@ jobs:
 
       - name: Slack - GitHub Actions Slack integration
         uses: act10ns/slack@v2.0.0
+        if: github.event.pull_request.merged == true
         with:
           status: ${{ job.status }}
-          message:
-            'Test Message'
+          message: |
+            New Deployment: ${{ env.title }} :rocket:
+            
+            Environment: Main
+            
+            Version: ${{ env.version }}
+            
+            Key Features/Changes: 
+              ${{ join(split(env.changes, ','), '\n* ') }}
+            
+            Additional Notes: 
+              ${{ join(split(env.additional_notes, ','), '\n* ') }}
+
+            Key Features/Changes: 
+              ${{ env.changes}}
+
+            Key Features/Changes: 
+              ${{ env.additional_notes}}
           channel: '#test-deployments'
        
       
