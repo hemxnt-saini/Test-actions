@@ -31,8 +31,18 @@ jobs:
           echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
 
       - name: Display Extracted Information
+        if: github.event.pull_request.merged === true
         run: |
-          echo "Outputs: $(echo '${{ toJson(steps.extract-info.outputs) }}' | jq -r tostring)"
+          echo "Merge Outputs: $(echo '${{ toJson(steps.extract-info.outputs) }}' | jq -r tostring)"
+          echo "Title: ${{ steps.extract-info.outputs.title }}"
+          echo "Version: ${{ steps.extract-info.outputs.version }}"
+          echo "Changes: ${{ steps.extract-info.outputs.changes }}"
+          echo "Additional Notes: ${{ steps.extract-info.outputs.additional_notes }}"
+
+      - name: Display Extracted Information
+        if: github.event.pull_request.merged === false
+        run: |
+          echo "Closed Outputs: $(echo '${{ toJson(steps.extract-info.outputs) }}' | jq -r tostring)"
           echo "Title: ${{ steps.extract-info.outputs.title }}"
           echo "Version: ${{ steps.extract-info.outputs.version }}"
           echo "Changes: ${{ steps.extract-info.outputs.changes }}"
