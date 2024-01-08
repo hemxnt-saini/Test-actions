@@ -21,18 +21,34 @@ jobs:
           echo "PR DESC: $PR_DESCRIPTION"
           TITLE=$(echo "$PR_DESCRIPTION" | grep -oP '\*\*Title:\*\* \K.*' || true)
           VERSION=$(echo "$PR_DESCRIPTION" | grep -oP '\*\*Version:\*\* \K.*' || true)
-          # Extract changes as an array
-          IFS=$'\n' CHANGES=($(echo "${{ github.event.pull_request.body }}" | awk -v RS='' '/\*\*Changes:\*\* \K(.|\n)*?(\*\*|$)/' | grep -oP '- .*'))
-          echo "Changes: ${CHANGES[@]}"
+          # Extract Changes from the Pull Request description and store in an array
+          IFS=$'\n' read -r -a CHANGES <<< "$(echo "${{ github.event.pull_request.body }}" | grep -oP '\*\*Changes:\*\* \K.*' | sed '/^\s*$/d' | sed 's/^- //')"
           ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP '\*\*Additional Notes:\*\* \K.*' || true)
+
+          echo "Changes:"
+          for change in "${CHANGES[@]}"; do
+            echo "  - $change"
+          done
+          
           echo "title=$TITLE" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_ENV
-          echo "changes=${CHANGES[@]}" >> $GITHUB_ENV
+          
+          for i in "${!CHANGES[@]}"; do
+            echo "PR_CHANGE_$i=${CHANGES[$i]}" >> $GITHUB_ENV
+          done
+          
           echo "additional_notes=$ADDITIONAL_NOTES" >> $GITHUB_ENV
 
         env:
           PR_DESCRIPTION: ${{ github.event.pull_request.body }}
+          
+      - name: Use PR Info
+        run: |
+          echo "Using PR Changes:"
+          for i in "${!CHANGES[@]}"; do
+            echo "  - Change $((i+1)): ${CHANGES[$i]}"
+          done
 
       - name: Display Extracted Information
         run: |
-          echo "Outputs: Title=${{ env.title }} Version=${{ env.version }} Changes=${{ env.changes }} Additional Notes=${{ env.additional_notes }}"
+          echo "Outputs: Title=${{ env.title }} Version=${{ env.version }} Additional Notes=${{ env.additional_notes }}"
