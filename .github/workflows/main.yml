@@ -26,9 +26,10 @@ jobs:
           
           # Extract Changes and store in an array
           CHANGES_ARRAY=($(echo "$PR_DESCRIPTION" | awk -v RS='' '/Changes:\s*\*\*/ {gsub("- ", ""); print $0}'))
-          
+          echo "Changes Arr: $CHANGES_ARRAY"
           # Set Changes array as a comma-separated string
           CHANGES=$(IFS=,; echo "${CHANGES_ARRAY[*]}")
+          echo "Changes: $CHANGES"
           
           ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\*\*\s*\K.*' || true)
           
