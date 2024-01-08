@@ -21,10 +21,10 @@ jobs:
           echo "Github Info: $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)"
           PR_DESCRIPTION=$(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)
           echo "PR DESC: $PR_DESCRIPTION"
-          TITLE=$(echo "$PR_DESCRIPTION" | grep -oP 'Title:**\s*\K.*' || true)
-          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:**\s*\K.*'|| true)
-          CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP 'Changes:**\s*\K.*'|| true)
-          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:**\s*\K.*'|| true)
+          TITLE=$(echo "$PR_DESCRIPTION" | grep -oP 'Title:\s*\*\*\s*\K.*' || true)
+          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\*\*\s*\K.*' || true)
+          CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP 'Changes:\s*\*\*\s*\K.*' || true)
+          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\*\*\s*\K.*' || true)
           echo "::set-output name=title::$TITLE"
           echo "::set-output name=version::$VERSION"
           echo "::set-output name=changes::$CHANGES"
