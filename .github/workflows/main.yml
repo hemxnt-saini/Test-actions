@@ -14,22 +14,23 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-
+        
       - name: Extract PR information
         id: extract_info
         run: |
-          echo "PR: $PR_BODY"
           title=$(echo "$PR_BODY" | grep -m1 '^**Title:**' | sed -e 's/^**Title:** //')
           version=$(echo "$PR_BODY" | grep -m1 '^**Version:**' | sed -e 's/^**Version:** //')
           changes=$(echo "$PR_BODY" | grep '^**Changes:**' -A 2 | grep -v '^**Changes:**' | sed '/^$/d' | sed 's/^- //')
+  
           additional_notes=$(echo "$PR_BODY" | grep -m1 '^**Additional Notes:**' | sed -e 's/^**Additional Notes:** //')
+  
           echo "::set-output name=title::$title"
           echo "::set-output name=version::$version"
           echo "::set-output name=changes::$changes"
           echo "::set-output name=additional_notes::$additional_notes"
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
-    
+
       - name: Display formatted information
         run: |
           echo "Title: '${{ steps.extract_info.outputs.title }}'"
