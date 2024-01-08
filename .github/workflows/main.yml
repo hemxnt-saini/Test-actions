@@ -12,15 +12,16 @@ jobs:
     name: Build Image and Deploy ECS
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
+    - name: Extract Changes
+      run: |
+        PR_BODY="**Title:** Test Deployment\r\n\r\n**Version:** Test Version\r\n\r\n**Changes:** \r\n- Test change1\r\n- Test change2\r\n\r\n**Additional Notes:** Test Additional Notes"
         
-      - name: Extract Changes
-        id: extract_changes
-        run: |
-          PR_DESCRIPTION=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" | \
-            jq -r '.body')
-          echo "PR: $PR_DESCRIPTION"
-          CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP '(?<=Changes:)\s*[\n\r]*\K(.+?)(?=\r\n\r\n|$)')
-          echo "Changes: $CHANGES"
+        # Extract the changes from the PR_BODY string
+        CHANGES=$(echo "$PR_BODY" | grep -oP '(?<=- ).*(?=\r\n)')
+
+        # Set the CHANGES as an environment variable
+        echo "CHANGES=$CHANGES" >> $GITHUB_ENV
+
+    - name: Show Changes
+      run: | 
+        echo "Changes: ${{ env.CHANGES }}"
