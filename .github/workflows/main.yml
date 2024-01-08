@@ -15,10 +15,7 @@ jobs:
       - name: Extract Changes
         run: |
           TITLE=$(echo "$PR_BODY" | grep -oP '\*\*Title:\*\* \K.*' || true)
-          echo "TITLE=$TITLE"
-          
           VERSION=$(echo "$PR_BODY" | grep -oP '\*\*Version:\*\* \K.*' || true)
-          echo "VERSION=$VERSION"
           
           PR_BODY=${PR_BODY//\*/}
           PR_BODY=${PR_BODY//\\r/}
@@ -36,7 +33,6 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_ENV
           echo "changes=$CHANGES_STRING" >> $GITHUB_ENV
           echo "additional_notes=$ADDITIONAL_NOTES_STRING" >> $GITHUB_ENV
-
           
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
@@ -44,8 +40,8 @@ jobs:
       - name: Display Extracted Information
         run: |
           echo "Title=${{ env.title }}"
-          echo "Title=${{ env.version }}"
-          echo "Title=${{ env.changes }}"
-          echo "Title=${{ env.additional_notes }}"
+          echo "Version=${{ env.version }}"
+          echo "Changes=${{ env.changes }}"
+          echo "Additional Notes=${{ env.additional_notes }}"
        
       
