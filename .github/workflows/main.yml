@@ -18,7 +18,7 @@ jobs:
       - name: Extract PR information
         id: extract_info
         run: |
-          title=$(echo "$PR_BODY" | grep -m1 '^**Title:**' | sed -e 's/^**Title:** //')
+          title=$(echo "$PR_BODY" | grep -m1 '^**Title:**' | sed -E 's/^\\*\\*Title:\\*\\* //')
           version=$(echo "$PR_BODY" | grep -m1 '^**Version:**' | sed -e 's/^**Version:** //')
           changes=$(echo "$PR_BODY" | grep '^**Changes:**' -A 2 | grep -v '^**Changes:**' | sed '/^$/d' | sed 's/^- //')
   
