@@ -15,30 +15,24 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         
-      - name: Extract PR information
-        id: extract_info
+      - name: Extract Information from PR Description
+        id: extract-info
         run: |
-          title=$(echo "$PR_BODY" | awk -F': ' '/^**Title:/{print $2}')
-          version=$(echo "$PR_BODY" | awk -F': ' '/^**Version:/{print $2}')
-          changes=$(echo "$PR_BODY" | awk '/^**Changes:/{flag=1; next} /^**/{flag=0} flag{gsub(/^- /, "", $0); print "- " $0}' | sed '/^$/d')
-          additional_notes=$(echo "$PR_BODY" | awk -F': ' '/^**Additional Notes:/{print $2}')
-        
-          echo "Raw PR Body: $PR_BODY"
-          echo "Extracted Title: '$title'"
-          echo "Extracted Version: '$version'"
-          echo "Extracted Changes: [$changes]"
-          echo "Extracted Additional Notes: '$additional_notes'"
-          
-          echo "::set-output name=title::$title"
-          echo "::set-output name=version::$version"
-          echo "::set-output name=changes::$changes"
-          echo "::set-output name=additional_notes::$additional_notes"
-        env:
-          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_DESCRIPTION=${{ github.event.pull_request.body }}
+          echo "PR DESC: $PR_DESCRIPTION"
+          TITLE=$(echo "$PR_DESCRIPTION" | grep -oP 'Title:\s*\K.*' || true)
+          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*'|| true)
+          CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP 'Changes:\s*\K.*'|| true)
+          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\K.*'|| true)
+          echo "::set-output name=title::$TITLE"
+          echo "::set-output name=version::$VERSION"
+          echo "::set-output name=changes::$CHANGES"
+          echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
 
-      - name: Display formatted information
+      - name: Display Extracted Information
         run: |
-          echo "Title: '${{ steps.extract_info.outputs.title }}'"
-          echo "Version: '${{ steps.extract_info.outputs.version }}'"
-          echo "Changes: [${{ steps.extract_info.outputs.changes }}]"
-          echo "Additional Notes: '${{ steps.extract_info.outputs.additional_notes }}'"
+          echo "Outputs: $(echo '${{ toJson(steps.extract-info.outputs) }}' | jq -r tostring)"
+          echo "Title: ${{ steps.extract-info.outputs.title }}"
+          echo "Version: ${{ steps.extract-info.outputs.version }}"
+          echo "Changes: ${{ steps.extract-info.outputs.changes }}"
+          echo "Additional Notes: ${{ steps.extract-info.outputs.additional_notes }}"
