@@ -1,4 +1,4 @@
-name: Fetch PR Details
+name: Build and deploy dev images for AWS ECS
 
 on:
   pull_request:
@@ -7,7 +7,6 @@ on:
     branches:
       - main
 
-
 jobs:
   build:
     name: Build Image and Deploy ECS
@@ -15,18 +14,18 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-        
+
       - name: Extract Information from PR Description
         id: extract-info
         run: |
-          echo "Github Info: $(echo '${{ toJson(github.event.pull_request) }}' | jq -r tostring)"
+          echo "Github Info: $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)"
           PR_DESCRIPTION=$(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)
           echo "PR DESC: $PR_DESCRIPTION"
-          NAME=$(echo "$PR_DESCRIPTION" | grep -oP 'Name:\s*\K.*' || true)
+          TITLE=$(echo "$PR_DESCRIPTION" | grep -oP 'Title:\s*\K.*' || true)
           VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*'|| true)
           CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP 'Changes:\s*\K.*'|| true)
           ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\K.*'|| true)
-          echo "::set-output name=name::$NAME"
+          echo "::set-output name=title::$TITLE"
           echo "::set-output name=version::$VERSION"
           echo "::set-output name=changes::$CHANGES"
           echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
@@ -34,7 +33,7 @@ jobs:
       - name: Display Extracted Information
         run: |
           echo "Outputs: $(echo '${{ toJson(steps.extract-info.outputs) }}' | jq -r tostring)"
-          echo "Name: ${{ steps.extract-info.outputs.name }}"
+          echo "Title: ${{ steps.extract-info.outputs.title }}"
           echo "Version: ${{ steps.extract-info.outputs.version }}"
           echo "Changes: ${{ steps.extract-info.outputs.changes }}"
           echo "Additional Notes: ${{ steps.extract-info.outputs.additional_notes }}"
