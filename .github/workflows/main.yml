@@ -14,13 +14,10 @@ jobs:
     steps:
     - name: Extract Changes
       run: |
-        PR_BODY="**Title:** Test Deployment\r\n\r\n**Version:** Test Version\r\n\r\n**Changes:** \r\n- Test change1\r\n- Test change2\r\n\r\n**Additional Notes:** Test Additional Notes"
-        
-        # Extract the changes from the PR_BODY string
         CHANGES=$(echo "$PR_BODY" | grep -oP '(?<=- ).*(?=\r\n)')
-
-        # Set the CHANGES as an environment variable
         echo "CHANGES=$CHANGES" >> $GITHUB_ENV
+      env:
+          PR_BODY: ${{ github.event.pull_request.body }}
 
     - name: Show Changes
       run: | 
