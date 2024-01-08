@@ -19,8 +19,8 @@ jobs:
         id: extract-info
         run: |
           echo "PR DESC: $PR_DESCRIPTION"
-          TITLE=$(echo "$PR_DESCRIPTION" | grep -oP 'Title:\s*\*\*\s*\K.*' || true)
-          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\*\*\s*\K.*' || true)
+          TITLE=$(echo "${{ github.event.pull_request.body }}" | grep -oP '\*\*Title:\*\* \K.*')
+          VERSION=$(echo "${{ github.event.pull_request.body }}" | grep -oP '\*\*Version:\*\* \K.*')
           CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP 'Changes:\s*\*\*\s*\K.*' || true)
           ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\*\*\s*\K.*' || true)
           echo "title=$TITLE" >> $GITHUB_ENV
