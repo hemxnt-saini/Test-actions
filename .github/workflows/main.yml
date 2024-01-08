@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: Extract Changes
         run: |
-          PR_BODY="**Title:** Test Deployment\r\n\r\n**Version:** Test Version\r\n\r\n**Changes:** \r\n- Test change1\r\n- Test change2\r\n\r\n**Additional Notes:** Test Additional Notes"
-          
           PR_BODY=${PR_BODY//\*/}
           echo "PR_BODY=$PR_BODY"
           
@@ -30,3 +28,8 @@ jobs:
           
           CHANGES=$(echo "$CHANGES" | tr '\n' ',' | sed 's/,$//')
           echo "Changes=$CHANGES"
+          
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+       
+      
