@@ -22,5 +22,5 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" | \
             jq -r '.body')
           echo "PR: $PR_DESCRIPTION"
-          CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP '(?<=Changes:)\s*[\n\r]*(.*?)(?=\r\n\r\n|$)' | sed 's/^\s*\-\s*//')
+          CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP '(?<=Changes:)\s*[\n\r]*\K(.+?)(?=\r\n\r\n|$)')
           echo "Changes: $CHANGES"
