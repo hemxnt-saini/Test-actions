@@ -12,16 +12,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Extract Changes
+    - name: Fetch Changes
       run: |
         PR_BODY="**Title:** Test Deployment\r\n\r\n**Version:** Test Version\r\n\r\n**Changes:** \r\n- Test change1\r\n- Test change2\r\n\r\n**Additional Notes:** Test Additional Notes"
-        
-        # Extract the changes from the PR_BODY string using awk
-        CHANGES=$(echo "$PR_BODY" | awk -F '- ' 'BEGIN{ORS=","}{if($2)print $2}')
+        changes_section=$(echo "$PR_BODY" | grep -A 3 '^Changes:$' | tail -n +2)
+        echo "changes_section=$changes_section"
+        changes_lines=$(echo "$changes_section" | grep -v '^$' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        echo "changes_lines=$changes_lines"
+        changes=$(echo "$changes_lines" | sed 's/^- //' | tr '\n' ',')
+        echo "changes=$changes"
+        echo "Changes=$changes" >> $GITHUB_ENV
 
-        # Set the CHANGES as an environment variable
-        echo "CHANGES=$CHANGES" >> $GITHUB_ENV
 
-    - name: Show Changes
+    - name: Print Changes
       run: |
-        echo "Changes: ${{ env.CHANGES }}"
+        echo "The changes are: ${{ env.Changes }}"
+
