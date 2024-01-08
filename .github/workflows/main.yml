@@ -16,8 +16,8 @@ jobs:
       run: |
         PR_BODY="**Title:** Test Deployment\r\n\r\n**Version:** Test Version\r\n\r\n**Changes:** \r\n- Test change1\r\n- Test change2\r\n\r\n**Additional Notes:** Test Additional Notes"
         
-        # Extract the changes from the PR_BODY string
-        CHANGES=$(echo "$PR_BODY" | grep -oP '(?<=- ).*(?=\r\n)')
+        # Extract the changes from the PR_BODY string using awk
+        CHANGES=$(echo "$PR_BODY" | awk -F '- ' 'BEGIN{ORS=","}{if($2)print $2}')
 
         # Set the CHANGES as an environment variable
         echo "CHANGES=$CHANGES" >> $GITHUB_ENV
