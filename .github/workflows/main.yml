@@ -25,8 +25,7 @@ jobs:
           VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\*\*\s*\K.*' || true)
           
           # Extract Changes and store in an array
-          CHANGES_ARRAY=($(echo "$PR_DESCRIPTION" | grep -oP 'Changes:\s*\*\*\s*\K.*' | sed 's/^-\s*//'))
-          echo "Changes Arr: $CHANGES_ARRAY"
+          CHANGES_ARRAY=($(echo "$PR_DESCRIPTION" | awk -v RS='' '/Changes:\s*\*\*/ {gsub("- ", ""); print $0}'))
           
           # Set Changes array as a comma-separated string
           CHANGES=$(IFS=,; echo "${CHANGES_ARRAY[*]}")
@@ -37,7 +36,6 @@ jobs:
           echo "::set-output name=version::$VERSION"
           echo "::set-output name=changes::$CHANGES"
           echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
-
 
       - name: Display Extracted Information
         run: |
