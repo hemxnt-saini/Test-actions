@@ -15,33 +15,24 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Extract Information from PR Description
-        id: extract-info
+      - name: Extract PR information
+        id: extract_info
         run: |
-          echo "Github Info: $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)"
-          PR_DESCRIPTION=$(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)
-          echo "PR DESC: $PR_DESCRIPTION"
-          TITLE=$(echo "$PR_DESCRIPTION" | grep -oP 'Title:\s*\*\*\s*\K.*' || true)
-          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\*\*\s*\K.*' || true)
-          
-          # Extract Changes and store in an array
-          CHANGES_ARRAY=($(echo "$PR_DESCRIPTION" | awk -v RS='' '/Changes:\s*\*\*/ {gsub("- ", ""); print $0}'))
-          echo "Changes Arr: $CHANGES_ARRAY"
-          # Set Changes array as a comma-separated string
-          CHANGES=$(IFS=,; echo "${CHANGES_ARRAY[*]}")
-          echo "Changes: $CHANGES"
-          
-          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\*\*\s*\K.*' || true)
-          
-          echo "::set-output name=title::$TITLE"
-          echo "::set-output name=version::$VERSION"
-          echo "::set-output name=changes::$CHANGES"
-          echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
-
-      - name: Display Extracted Information
+          echo "PR: $PR_BODY"
+          title=$(echo "$PR_BODY" | grep -m1 '^**Title:**' | sed -e 's/^**Title:** //')
+          version=$(echo "$PR_BODY" | grep -m1 '^**Version:**' | sed -e 's/^**Version:** //')
+          changes=$(echo "$PR_BODY" | grep '^**Changes:**' -A 2 | grep -v '^**Changes:**' | sed '/^$/d' | sed 's/^- //')
+          additional_notes=$(echo "$PR_BODY" | grep -m1 '^**Additional Notes:**' | sed -e 's/^**Additional Notes:** //')
+          echo "::set-output name=title::$title"
+          echo "::set-output name=version::$version"
+          echo "::set-output name=changes::$changes"
+          echo "::set-output name=additional_notes::$additional_notes"
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+    
+      - name: Display formatted information
         run: |
-          echo "Merge Outputs: $(echo '${{ toJson(steps.extract-info.outputs) }}' | jq -r tostring)"
-          echo "Title: ${{ steps.extract-info.outputs.title }}"
-          echo "Version: ${{ steps.extract-info.outputs.version }}"
-          echo "Changes: ${{ steps.extract-info.outputs.changes }}"
-          echo "Additional Notes: ${{ steps.extract-info.outputs.additional_notes }}"
+          echo "Title: '${{ steps.extract_info.outputs.title }}'"
+          echo "Version: '${{ steps.extract_info.outputs.version }}'"
+          echo "Changes: [${{ steps.extract_info.outputs.changes }}]"
+          echo "Additional Notes: '${{ steps.extract_info.outputs.additional_notes }}'"
