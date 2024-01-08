@@ -43,5 +43,6 @@ jobs:
           status: ${{ job.status }}
           message:
             'Test Message'
+          channel: '#test-deployments'
        
       
