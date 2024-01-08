@@ -23,17 +23,14 @@ jobs:
           VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\*\*\s*\K.*' || true)
           CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP 'Changes:\s*\*\*\s*\K.*' || true)
           ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\*\*\s*\K.*' || true)
-          echo "::set-output name=title::$TITLE"
-          echo "::set-output name=version::$VERSION"
-          echo "::set-output name=changes::$CHANGES"
-          echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
+          echo "title=$TITLE" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_ENV
+          echo "changes=$CHANGES" >> $GITHUB_ENV
+          echo "additional_notes=$ADDITIONAL_NOTES" >> $GITHUB_ENV
+
         env:
           PR_DESCRIPTION: ${{ github.event.pull_request.body }}
 
       - name: Display Extracted Information
         run: |
-          echo "Outputs: $(echo '${{ toJson(steps.extract-info.outputs) }}' | jq -r tostring)"
-          echo "Title: ${{ steps.extract-info.outputs.title }}"
-          echo "Version: ${{ steps.extract-info.outputs.version }}"
-          echo "Changes: ${{ steps.extract-info.outputs.changes }}"
-          echo "Additional Notes: ${{ steps.extract-info.outputs.additional_notes }}"
+          echo "Outputs: Title=${{ env.title }} Version=${{ env.version }} Changes=${{ env.changes }} Additional Notes=${{ env.additional_notes }}"
