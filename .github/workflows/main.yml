@@ -18,10 +18,10 @@ jobs:
       - name: Extract PR information
         id: extract_info
         run: |
-          title=$(echo "$PR_BODY" | grep -m1 '^**Title:**' | sed -e 's/^**Title:** //')
-          version=$(echo "$PR_BODY" | grep -m1 '^**Version:**' | sed -e 's/^**Version:** //')
-          changes=$(echo "$PR_BODY" | awk '/^**Changes:**/{flag=1; next} /^**/{flag=0} flag{print "- " $2}' | sed '/^$/d')
-          additional_notes=$(echo "$PR_BODY" | grep -m1 '^**Additional Notes:**' | sed -e 's/^**Additional Notes:** //')
+          title=$(echo "$PR_BODY" | awk -F': ' '/^**Title:/{print $2}')
+          version=$(echo "$PR_BODY" | awk -F': ' '/^**Version:/{print $2}')
+          changes=$(echo "$PR_BODY" | awk '/^**Changes:/{flag=1; next} /^**/{flag=0} flag{gsub(/^- /, "", $0); print "- " $0}' | sed '/^$/d')
+          additional_notes=$(echo "$PR_BODY" | awk -F': ' '/^**Additional Notes:/{print $2}')
         
           echo "Raw PR Body: $PR_BODY"
           echo "Extracted Title: '$title'"
@@ -35,7 +35,6 @@ jobs:
           echo "::set-output name=additional_notes::$additional_notes"
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
-
 
       - name: Display formatted information
         run: |
