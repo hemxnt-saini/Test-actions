@@ -23,11 +23,11 @@ jobs:
           PR_BODY=${PR_BODY//\\n/}
           echo "PR_BODY=$PR_BODY"
           
-          CHANGES=$(echo "$PR_BODY" | awk -v RS="- " '/Additional/{gsub(/\n/,"",$0); print $0; exit}' | sed 's/,$//')
-          echo "Changes=$CHANGES"
+          CHANGES=$(echo "$PR_BODY" | sed -n -e '/Changes:/,/Additional Notes:/p' | grep '^-' | sed 's/^- //')
+          echo "Changes=$CHANGES_STRING"
           
-          CHANGES=$(echo "$CHANGES" | tr '\n' ',' | sed 's/,$//')
-          echo "Changes=$CHANGES"
+          CHANGES_STRING=$(echo "$CHANGES" | tr '\n' ',' | sed 's/,$//')
+          echo "Changes=$CHANGES_STRING"
           
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
