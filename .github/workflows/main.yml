@@ -21,9 +21,7 @@ jobs:
           title=$(echo "$PR_BODY" | grep -m1 '^**Title:**' | sed -e 's/^**Title:** //')
           version=$(echo "$PR_BODY" | grep -m1 '^**Version:**' | sed -e 's/^**Version:** //')
           changes=$(echo "$PR_BODY" | awk '/^**Changes:**/{flag=1; next} /^**/{flag=0} flag' | sed 's/^- //')
-        
           additional_notes=$(echo "$PR_BODY" | grep -m1 '^**Additional Notes:**' | sed -e 's/^**Additional Notes:** //')
-        
           echo "::set-output name=title::$title"
           echo "::set-output name=version::$version"
           echo "::set-output name=changes::$changes"
