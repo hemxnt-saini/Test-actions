@@ -15,18 +15,13 @@ jobs:
       - name: Extract Changes
         run: |
           PR_BODY="**Title:** Test Deployment\r\n\r\n**Version:** Test Version\r\n\r\n**Changes:** \r\n- Test change1\r\n- Test change2\r\n\r\n**Additional Notes:** Test Additional Notes"
-          
-          CLEAN_BODY1=$(echo "$PR_BODY" | tr -d '\r')
-          echo "CLEAN_BODY1=$CLEAN_BODY1"
-
-          CLEAN_BODY2=$(echo "$CLEAN_BODY1" | tr -d '\n')
-          echo "CLEAN_BODY2=$CLEAN_BODY2"
-
-          CLEAN_BODY3=$(echo "$CLEAN_BODY2" | tr -d '*')
-          echo "CLEAN_BODY3=$CLEAN_BODY3"
-          
-          CHANGES_STRING=$(echo "$CLEAN_BODY3" | grep -oP '(?<=- ).*')
-          echo "CHANGES_STRING=$CHANGES_STRING"
-          
-          CHANGES=$(echo "$CHANGES_STRING" | paste -sd "," -)
+          PR_BODY=${PR_BODY//\*/}
+          echo "PR_BODY=$PR_BODY"
+          PR_BODY=${PR_BODY//\\r/}
+          echo "PR_BODY=$PR_BODY"
+          PR_BODY=${PR_BODY//\\n/}
+          echo "PR_BODY=$PR_BODY"
+          CHANGES=$(echo "$PR_BODY" | grep -o '\- [^\\]*')
+          echo "Changes=$CHANGES"
+          CHANGES=$(echo "$CHANGES" | tr '\n' ',' | sed 's/,$//')
           echo "Changes=$CHANGES"
