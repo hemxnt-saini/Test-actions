@@ -18,7 +18,6 @@ jobs:
       - name: Extract Information from PR Description
         id: extract-info
         run: |
-          PR_DESCRIPTION=${{ github.event.pull_request.body }}
           echo "PR DESC: $PR_DESCRIPTION"
           TITLE=$(echo "$PR_DESCRIPTION" | grep -oP 'Title:\s*\K.*' || true)
           VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\K.*'|| true)
@@ -28,6 +27,8 @@ jobs:
           echo "::set-output name=version::$VERSION"
           echo "::set-output name=changes::$CHANGES"
           echo "::set-output name=additional_notes::$ADDITIONAL_NOTES"
+        env:
+          PR_DESCRIPTION: ${{ github.event.pull_request.body }}
 
       - name: Display Extracted Information
         run: |
