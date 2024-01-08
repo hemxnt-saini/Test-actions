@@ -23,12 +23,19 @@ jobs:
           changes=$(echo "$PR_BODY" | awk -F': ' '/^**Changes:/{flag=1; next} /^**/{flag=0} flag{print $2}' | sed "s/^ -//")
           additional_notes=$(echo "$PR_BODY" | awk -F': ' '/^**Additional Notes:/{print $2}')
           
+          echo "Raw PR Body: $PR_BODY"
+          echo "Extracted Title: '$title'"
+          echo "Extracted Version: '$version'"
+          echo "Extracted Changes: [$changes]"
+          echo "Extracted Additional Notes: '$additional_notes'"
+          
           echo "::set-output name=title::$title"
           echo "::set-output name=version::$version"
           echo "::set-output name=changes::$changes"
           echo "::set-output name=additional_notes::$additional_notes"
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
+
 
 
       - name: Display formatted information
