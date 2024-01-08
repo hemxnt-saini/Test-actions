@@ -19,10 +19,10 @@ jobs:
         id: extract-info
         run: |
           echo "PR DESC: $PR_DESCRIPTION"
-          TITLE=$(echo "$PR_DESCRIPTION" | sed -n 's/^[[:space:]]*[*]*[[:space:]]*Title:[[:space:]]*//p' || true)
-          VERSION=$(echo "$PR_DESCRIPTION" | sed -n 's/^[[:space:]]*[*]*[[:space:]]*Version:[[:space:]]*//p' || true)
-          CHANGES=$(echo "$PR_DESCRIPTION" | sed -n 's/^[[:space:]]*[*]*[[:space:]]*Changes:[[:space:]]*//p' || true)
-          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | sed -n 's/^[[:space:]]*[*]*[[:space:]]*Additional Notes:[[:space:]]*//p' || true)
+          TITLE=$(echo "$PR_DESCRIPTION" | grep -oP 'Title:\s*\*\*\s*\K.*' || true)
+          VERSION=$(echo "$PR_DESCRIPTION" | grep -oP 'Version:\s*\*\*\s*\K.*' || true)
+          CHANGES=$(echo "$PR_DESCRIPTION" | grep -oP 'Changes:\s*\*\*\s*\K.*' || true)
+          ADDITIONAL_NOTES=$(echo "$PR_DESCRIPTION" | grep -oP 'Additional Notes:\s*\*\*\s*\K.*' || true)
           echo "::set-output name=title::$TITLE"
           echo "::set-output name=version::$VERSION"
           echo "::set-output name=changes::$CHANGES"
