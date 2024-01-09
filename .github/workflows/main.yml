@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Extract Changes
+      - name: Extract Information from PR Description
         run: |
           echo "Github Info: $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)"
           TITLE=$(echo "$PR_BODY" | grep -oP '\*\*Title:\*\* \K.*' || true)
@@ -48,25 +48,26 @@ jobs:
         id: format_changes
         run: |
           changes="${{ env.changes }}"
-          echo "Original Changes: $changes"
+          echo "Changes: $changes"
           IFS=, read -ra changes_array <<< "$changes"
-          echo "Changes Array: $changes_array"
           formatted_changes=""
           for change in "${changes_array[@]}"; do
-            echo "Single change: $change"
+            echo "Current change: $change"
             formatted_changes+="• $change"
           done
           echo "FORMATTED_CHANGES: ${formatted_changes}"
           echo "FORMATTED_CHANGES=${formatted_changes}" >> $GITHUB_ENV
 
           additional_notes="${{ env.additional_notes }}"
+          echo "Additional Notes: $additional_notes"
           IFS=, read -ra additional_notes_array <<< "$additional_notes"
-          formatted_notes_changes=""
+          formatted_notes=""
           for note in "${additional_notes_array[@]}"; do
-            formatted_notes_changes+="• $note"
+            echo "Current note: $note"
+            formatted_notes+="• $note"
           done
-          echo "FORMATTED_NOTES_CHANGES: ${formatted_notes_changes}"
-          echo "FORMATTED_NOTES_CHANGES=${formatted_notes_changes}" >> $GITHUB_ENV
+          echo "FORMATTED_NOTES: ${formatted_notes}"
+          echo "FORMATTED_NOTES=${formatted_notes}" >> $GITHUB_ENV
 
       - name: Slack - GitHub Actions Slack integration
         uses: act10ns/slack@v2.0.0
@@ -84,7 +85,6 @@ jobs:
               ${{ env.FORMATTED_CHANGES }}
             
             Additional Notes: 
-              ${{ env.FORMATTED_NOTES_CHANGES }}
+              ${{ env.FORMATTED_NOTES }}
           channel: '#test-deployments'
-
       
