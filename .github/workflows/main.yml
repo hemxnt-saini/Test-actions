@@ -3,8 +3,9 @@ name: Build and deploy dev images for AWS ECS
 env:
   ECS_SERVICE: hyb-dev-service
   DEPLOYMENT_URL: https://dev-ecs.usehybrid.co/
-  ECS_VERSION: ecs-version
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+  AWS_REGION: ap-southeast-1
+  ECS_TASK_DEFINITION_NAME: devBackend
 
 on:
   pull_request:
@@ -18,6 +19,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Get latest ECS task definition revision
+        id: get_task_definition
+        run: |
+          export ECS_VERSION=$(aws ecs describe-task-definition --region ${{ env.AWS_REGION }} --task-definition ${{ env.ECS_TASK_DEFINITION_NAME }} --query 'taskDefinition.revision' --output text)
+          echo "ECS_VERSION=$ECS_VERSION" >> $GITHUB_ENV
+
+      - name: Display ECS version
+        run: |
+          echo "ECS_VERSION=$ECS_VERSION"
+          
       - name: Extract Information from PR Description
         run: |
           echo "Github Info: $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)"
