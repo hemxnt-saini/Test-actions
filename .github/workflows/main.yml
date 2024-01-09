@@ -47,10 +47,19 @@ jobs:
           IFS=, read -ra changes_array <<< "$changes"
           formatted_changes=""
           for change in "${changes_array[@]}"; do
-            formatted_changes+="* $change\n"
+            formatted_changes+="* $change"
           done
           echo "FORMATTED_CHANGES: ${formatted_changes}"
           echo "FORMATTED_CHANGES=${formatted_changes}" >> $GITHUB_ENV
+
+          additional_notes="${{ env.additional_notes }}"
+          IFS=, read -ra additional_notes_array <<< "$additional_notes"
+          formatted_notes_changes=""
+          for note in "${additional_notes_array[@]}"; do
+            formatted_notes_changes+="* $note"
+          done
+          echo "FORMATTED_NOTES_CHANGES: ${formatted_notes_changes}"
+          echo "FORMATTED_NOTES_CHANGES=${formatted_notes_changes}" >> $GITHUB_ENV
 
       - name: Slack - GitHub Actions Slack integration
         uses: act10ns/slack@v2.0.0
@@ -67,7 +76,7 @@ jobs:
               ${{ env.FORMATTED_CHANGES }}
             
             Additional Notes: 
-              ${{ env.additional_notes }}
+              ${{ env.FORMATTED_NOTES_CHANGES }}
           channel: '#test-deployments'
 
       
