@@ -40,6 +40,17 @@ jobs:
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
 
+      - name: Format Changes List
+        id: format_changes
+        run: |
+          echo "Changes:"
+          IFS=, read -ra changes <<< "${{ env.changes }}"
+          for change in "${changes[@]}"; do
+            echo "* $change"
+          done
+          echo "::set-output name=formatted_changes::${changes[*]}"
+
+
       - name: Slack - GitHub Actions Slack integration
         uses: act10ns/slack@v2.0.0
         with:
@@ -51,24 +62,11 @@ jobs:
             
             Version: ${{ env.version }}
             
-            Key Features/Changes: 
-              ${{ join(formatList(env.changes), '\n') }}
+            Key Features/Changes:
+              ${{ steps.format_changes.outputs.formatted_changes | join('\n') }}
             
             Additional Notes: 
               ${{ env.additional_notes }}
           channel: '#test-deployments'
-
-      - name: Format Changes List
-        run: |
-          formatList() {
-            local IFS=,   # Set comma as the delimiter
-            local changes=$1
-            local -a changesArray=($changes)
-            for change in "${changesArray[@]}"; do
-              echo "* $change"
-            done
-          }
-      
-          export -f formatList
 
       
