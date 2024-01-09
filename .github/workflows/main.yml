@@ -43,12 +43,13 @@ jobs:
       - name: Format Changes List
         id: format_changes
         run: |
-          echo "Changes:"
-          IFS=, read -ra changes <<< "${{ env.changes }}"
-          for change in "${changes[@]}"; do
-            echo "* $change"
+          changes="${{ env.changes }}"
+          IFS=, read -ra changes_array <<< "$changes"
+          formatted_changes=""
+          for change in "${changes_array[@]}"; do
+            formatted_changes+="* $change\n"
           done
-          echo "::set-output name=formatted_changes::${changes[*]}"
+          echo "::set-output name=formatted_changes::${formatted_changes}"
 
 
       - name: Slack - GitHub Actions Slack integration
@@ -63,7 +64,7 @@ jobs:
             Version: ${{ env.version }}
             
             Key Features/Changes:
-              ${{ steps.format_changes.outputs.formatted_changes | join('\n') }}
+              ${{ steps.format_changes.outputs.formatted_changes }}
             
             Additional Notes: 
               ${{ env.additional_notes }}
