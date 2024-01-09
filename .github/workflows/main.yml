@@ -20,15 +20,11 @@ jobs:
 
     steps:
       - name: Get latest ECS task definition revision
-        id: get_task_definition
         run: |
           export ECS_VERSION=$(aws ecs describe-task-definition --region ${{ env.AWS_REGION }} --task-definition ${{ env.ECS_TASK_DEFINITION_NAME }} --query 'taskDefinition.revision' --output text)
+          echo "ECS_VERSION: $ECS_VERSION"
           echo "ECS_VERSION=$ECS_VERSION" >> $GITHUB_ENV
 
-      - name: Display ECS version
-        run: |
-          echo "ECS_VERSION=$ECS_VERSION"
-          
       - name: Extract Information from PR Description
         run: |
           echo "Github Info: $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)"
