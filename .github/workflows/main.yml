@@ -17,8 +17,8 @@ jobs:
     steps:
       - name: Extract Changes
         run: |
-          TITLE=$(echo "$PR_BODY" | grep -oP 'Title:\s*\K.*' || true)
-          VERSION=$(echo "$PR_BODY" | grep -oP 'Version:\s*\K.*'|| true)
+          TITLE=$(echo "$PR_BODY" | grep -oP '\*\*Title:\*\* \K.*' || true)
+          VERSION=$(echo "$PR_BODY" | grep -oP '\*\*Version:\*\* \K.*' || true)
           
           PR_BODY=${PR_BODY//\*/}
           PR_BODY=${PR_BODY//\\r/}
@@ -66,7 +66,7 @@ jobs:
         with:
           status: ${{ job.status }}
           message: |
-            New Deployment: ${{ env.title }}:rocket:
+            New Deployment: ${{ env.title }}
             
             Environment: Main
             
