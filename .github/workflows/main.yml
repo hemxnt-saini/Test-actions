@@ -1,6 +1,8 @@
 name: Build and deploy dev images for AWS ECS
 
 env:
+  ECS_SERVICE: hyb-dev-service
+  DEPLOYMENT_URL: https://dev-ecs.usehybrid.co/
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
 on:
@@ -73,7 +75,8 @@ jobs:
           message: |
             New Deployment: ${{ env.title }}
             
-            Environment: Main
+            Environment: Deployment of ${{ env.ECS_SERVICE }} to ECS at ${{
+            env.DEPLOYMENT_URL }} completed successfully.
             
             Version: ${{ env.version }}
             
