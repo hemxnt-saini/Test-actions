@@ -50,6 +50,8 @@ jobs:
             formatted_changes+="* $change\n"
           done
           echo "::set-output name=formatted_changes::${formatted_changes}"
+          echo "Changes: ${formatted_changes}"
+          echo "Changes2: ${{ steps.format_changes.outputs.formatted_changes }}"
 
 
       - name: Slack - GitHub Actions Slack integration
