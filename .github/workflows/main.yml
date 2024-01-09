@@ -47,9 +47,9 @@ jobs:
           IFS=, read -ra changes_array <<< "$changes"
           formatted_changes=""
           for change in "${changes_array[@]}"; do
-            formatted_changes+="* $change"$'\n'
+            formatted_changes+="* $change\n"
           done
-          formatted_changes="${formatted_changes//\'/\'}"
+          echo "FORMATTED_CHANGES: ${formatted_changes}"
           echo "FORMATTED_CHANGES=${formatted_changes}" >> $GITHUB_ENV
 
       - name: Slack - GitHub Actions Slack integration
