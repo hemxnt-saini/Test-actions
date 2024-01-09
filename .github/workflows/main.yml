@@ -83,9 +83,9 @@ jobs:
             Version: ${{ env.ECS_VERSION }}
             
             Key Features/Changes:
-              ${{ env.FORMATTED_CHANGES }}
+            ${{ env.FORMATTED_CHANGES }}
             
             Additional Notes: 
-              ${{ env.FORMATTED_NOTES }}
+            ${{ env.FORMATTED_NOTES }}
           channel: '#test-deployments'
       
