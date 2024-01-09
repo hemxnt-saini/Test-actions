@@ -49,9 +49,8 @@ jobs:
           for change in "${changes_array[@]}"; do
             formatted_changes+="* $change\n"
           done
-          echo "::set-output name=formatted_changes::${formatted_changes}"
-          echo "Changes: ${formatted_changes}"
-          echo "Changes2: ${{ steps.format_changes.outputs.formatted_changes }}"
+          echo "formated_changes: ${formatted_changes}"
+          echo "FORMATTED_CHANGES=${formatted_changes}" >> $GITHUB_ENV
 
 
       - name: Slack - GitHub Actions Slack integration
@@ -66,7 +65,7 @@ jobs:
             Version: ${{ env.version }}
             
             Key Features/Changes:
-              ${{ steps.format_changes.outputs.formatted_changes }}
+              ${{ env.FORMATTED_CHANGES }}
             
             Additional Notes: 
               ${{ env.additional_notes }}
