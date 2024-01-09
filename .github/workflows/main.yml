@@ -49,9 +49,8 @@ jobs:
           for change in "${changes_array[@]}"; do
             formatted_changes+="* $change"$'\n'
           done
-          echo "formated_changes: ${formatted_changes}"
+          formatted_changes="${formatted_changes//\'/\'}"
           echo "FORMATTED_CHANGES=${formatted_changes}" >> $GITHUB_ENV
-
 
       - name: Slack - GitHub Actions Slack integration
         uses: act10ns/slack@v2.0.0
