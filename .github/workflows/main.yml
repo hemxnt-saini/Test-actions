@@ -51,7 +51,7 @@ jobs:
           formatted_changes=""
           for change in "${changes_array[@]}"; do
             echo "Single change: $change"
-            formatted_changes+="* $change"
+            formatted_changes+="• $change"
           done
           echo "FORMATTED_CHANGES: ${formatted_changes}"
           echo "FORMATTED_CHANGES=${formatted_changes}" >> $GITHUB_ENV
@@ -60,7 +60,7 @@ jobs:
           IFS=, read -ra additional_notes_array <<< "$additional_notes"
           formatted_notes_changes=""
           for note in "${additional_notes_array[@]}"; do
-            formatted_notes_changes+="* $note"
+            formatted_notes_changes+="• $note"
           done
           echo "FORMATTED_NOTES_CHANGES: ${formatted_notes_changes}"
           echo "FORMATTED_NOTES_CHANGES=${formatted_notes_changes}" >> $GITHUB_ENV
