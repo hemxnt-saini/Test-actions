@@ -44,9 +44,12 @@ jobs:
         id: format_changes
         run: |
           changes="${{ env.changes }}"
+          echo "Original Changes: $changes"
           IFS=, read -ra changes_array <<< "$changes"
+          echo "Changes Array: $changes_array"
           formatted_changes=""
           for change in "${changes_array[@]}"; do
+            echo "Single change: $change"
             formatted_changes+="* $change"
           done
           echo "FORMATTED_CHANGES: ${formatted_changes}"
