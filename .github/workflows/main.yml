@@ -52,10 +52,23 @@ jobs:
             Version: ${{ env.version }}
             
             Key Features/Changes: 
-              ${{ env.changes }}
+              ${{ join(formatList(env.changes), '\n') }}
             
             Additional Notes: 
               ${{ env.additional_notes }}
           channel: '#test-deployments'
-       
+
+      - name: Format Changes List
+        run: |
+          formatList() {
+            local IFS=,   # Set comma as the delimiter
+            local changes=$1
+            local -a changesArray=($changes)
+            for change in "${changesArray[@]}"; do
+              echo "* $change"
+            done
+          }
+      
+          export -f formatList
+
       
