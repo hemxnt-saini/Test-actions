@@ -88,7 +88,7 @@ jobs:
             Environment: Deployment of ${{ env.ECS_SERVICE }} to ECS at ${{
             env.DEPLOYMENT_URL }} completed successfully.
             
-            Version: ${{ env.ECS_VERSION }}
+            Version: 963
             
             Key Features/Changes:
             ${{ env.FORMATTED_CHANGES }}
