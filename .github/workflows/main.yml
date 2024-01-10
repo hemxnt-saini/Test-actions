@@ -39,12 +39,12 @@ jobs:
           PR_BODY=${PR_BODY//\"/}
           PR_BODY=${PR_BODY//\,/}
 
-          CHANGES=$(echo "$PR_BODY" | sed -n -e '/Changes:/,/Additional Notes:/p' | grep '^-' | sed 's/^- //')
-          CHANGES_STRING=$(echo "$CHANGES" | tr '\n' ',' | sed 's/,$//')
+          CHANGES=$(echo "$PR_BODY" | sed -n -e '/Changes:/,/Additional Notes:/p' | grep '^-' | sed 's/^- //' || true)
+          CHANGES_STRING=$(echo "$CHANGES" | tr '\n' ',' | sed 's/,$//' || true)
           echo "Changes=$CHANGES_STRING"
 
-          ADDITIONAL_NOTES=$(echo "$PR_BODY" | sed -n -e '/Additional Notes:/,/Issue ticket number and link/p' | grep '^-' | sed 's/^- //')
-          ADDITIONAL_NOTES_STRING=$(echo "$ADDITIONAL_NOTES" | tr '\n' ',' | sed 's/,$//')
+          ADDITIONAL_NOTES=$(echo "$PR_BODY" | sed -n -e '/Additional Notes:/,/Issue ticket number and link/p' | grep '^-' | sed 's/^- //' || true)
+          ADDITIONAL_NOTES_STRING=$(echo "$ADDITIONAL_NOTES" | tr '\n' ',' | sed 's/,$//' || true)
           echo "Additional Notes=$ADDITIONAL_NOTES_STRING"
 
           echo "title=$TITLE" >> $GITHUB_ENV
