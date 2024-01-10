@@ -83,7 +83,7 @@ jobs:
         with:
           status: ${{ job.status }}
           message: |
-            *New Deployment :rocket::* ${{ env.title }}
+            *New Deployment :rocket:* ${{ env.title }}
             
             *Environment:* Deployment of ${{ env.ECS_SERVICE }} to ECS at ${{ env.DEPLOYMENT_URL }} completed successfully.
             
