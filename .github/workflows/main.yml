@@ -40,7 +40,7 @@ jobs:
           PR_BODY=${PR_BODY//\,/}
 
           CHANGES=$(echo "$PR_BODY" | sed -n -e '/Changes:/,/Additional Notes:/p' | grep '^-' | sed 's/^- //' || true)
-          CHANGES_STRING=$(echo "$CHANGES" | tr '\n' ',' | sed 's/,$//' || true)
+          CHANGES_STRING=$(echo "$CHANGES" | sed ':a;N;$!ba;s/\n/, /g' || true)
           echo "Changes=$CHANGES_STRING"
 
           ADDITIONAL_NOTES=$(echo "$PR_BODY" | sed -n -e '/Additional Notes:/,/Issue ticket number and link/p' | grep '^-' | sed 's/^- //' || true)
