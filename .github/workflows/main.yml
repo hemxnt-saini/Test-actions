@@ -6,6 +6,7 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
   AWS_REGION: ap-southeast-1
   ECS_TASK_DEFINITION_NAME: devBackend
+  ECS_VERSION: 963
 
 on:
   pull_request:
@@ -87,7 +88,9 @@ jobs:
             
             *Environment:* Deployment of ${{ env.ECS_SERVICE }} to ECS at ${{ env.DEPLOYMENT_URL }} completed successfully.
             
-            *Version:* 963
+            *Version:* v${{ env.version }}
+
+            *Task Defination:Revision:* ${{ env.ECS_TASK_DEFINITION_NAME }}:${{ env.ECS_VERSION }}
             
             *Key Features/Changes:*
             ${{ env.FORMATTED_CHANGES }}
