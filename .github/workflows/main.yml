@@ -45,7 +45,7 @@ jobs:
           ADDITIONAL_NOTES_STRING=$(echo "$ADDITIONAL_NOTES" | tr '\n' ',' | sed 's/,$//' || true)
           echo "Additional Notes=$ADDITIONAL_NOTES_STRING"
 
-          echo "title= :rocket: $TITLE" >> $GITHUB_ENV
+          echo "title=$TITLE" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_ENV
           echo "changes=$CHANGES_STRING" >> $GITHUB_ENV
           echo "additional_notes=$ADDITIONAL_NOTES_STRING" >> $GITHUB_ENV
@@ -83,17 +83,17 @@ jobs:
         with:
           status: ${{ job.status }}
           message: |
-            New Deployment: ${{ env.title }}
+            *New Deployment:* ${{ env.title }}
             
-            Environment: Deployment of ${{ env.ECS_SERVICE }} to ECS at ${{
-            env.DEPLOYMENT_URL }} completed successfully.
+            *Environment:* Deployment of ${{ env.ECS_SERVICE }} to ECS at ${{ env.DEPLOYMENT_URL }} completed successfully.
             
-            Version: 963
+            *Version:* 963
             
-            Key Features/Changes:
+            *Key Features/Changes:*
             ${{ env.FORMATTED_CHANGES }}
             
-            Additional Notes: 
+            *Additional Notes:* 
             ${{ env.FORMATTED_NOTES }}
           channel: '#test-deployments'
+
       
