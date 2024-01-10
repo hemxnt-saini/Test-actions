@@ -35,7 +35,10 @@ jobs:
           PR_BODY=${PR_BODY//\\r/}
           PR_BODY=${PR_BODY//\\n/}
           PR_BODY=${PR_BODY//\`/}
+          PR_BODY=${PR_BODY//\'/}
+          echo "PR BODY: $PR_BODY"
           PR_BODY=${PR_BODY//\,/}
+          echo "PR BODY: $PR_BODY"
 
           CHANGES=$(echo "$PR_BODY" | jq -s -r '. | match("Changes:(.+)Additional Notes:"; "s") | .captures[0].string' | grep '^-' | sed 's/^- //')
           CHANGES_STRING=$(echo "$CHANGES" | sed ':a;N;$!ba;s/\n/,/g')
