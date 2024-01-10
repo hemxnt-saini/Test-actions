@@ -90,7 +90,7 @@ jobs:
             
             *Version:* v${{ env.version }}
 
-            *Task Defination:Revision:* ${{ env.ECS_TASK_DEFINITION_NAME }}:${{ env.ECS_VERSION }}
+            *Task Defination:Revision:* ${{ env.ECS_TASK_DEFINITION_NAME }}:963
             
             *Key Features/Changes:*
             ${{ env.FORMATTED_CHANGES }}
