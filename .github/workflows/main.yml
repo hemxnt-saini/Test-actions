@@ -45,7 +45,7 @@ jobs:
           ADDITIONAL_NOTES_STRING=$(echo "$ADDITIONAL_NOTES" | tr '\n' ',' | sed 's/,$//' || true)
           echo "Additional Notes=$ADDITIONAL_NOTES_STRING"
 
-          echo "title=$TITLE :rocket:" >> $GITHUB_ENV
+          echo "title= :rocket: $TITLE" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_ENV
           echo "changes=$CHANGES_STRING" >> $GITHUB_ENV
           echo "additional_notes=$ADDITIONAL_NOTES_STRING" >> $GITHUB_ENV
