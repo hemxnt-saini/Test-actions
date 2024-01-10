@@ -27,7 +27,6 @@ jobs:
 
       - name: Extract Information from PR Description
         run: |
-          echo "Github Info: $(echo '${{ toJson(github.event.pull_request.body) }}' | jq -r tostring)"
           TITLE=$(echo "$PR_BODY" | grep -oP '\*\*Title:\*\* \K.*' || true)
           VERSION=$(echo "$PR_BODY" | grep -oP '\*\*Version:\*\* \K.*' || true)
           
