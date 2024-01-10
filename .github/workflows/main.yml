@@ -35,6 +35,7 @@ jobs:
           PR_BODY=${PR_BODY//\\n/}
           PR_BODY=${PR_BODY//\`/}
           PR_BODY=${PR_BODY//\,/}
+          PR_BODY=${PR_BODY//\"/}
 
           CHANGES=$(echo "$PR_BODY" | sed -n -e '/Changes:/,/Additional Notes:/p' | grep '^-' | sed 's/^- //' || true)
           CHANGES_STRING=$(echo "$CHANGES" | tr '\n' ',' | sed 's/,$//' || true)
