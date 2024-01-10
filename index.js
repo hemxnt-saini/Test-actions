@@ -4,7 +4,7 @@ const app = express();
 
 app.get('/', (req, res) => {
   res.set('Content-Type', 'text/plain');
-  res.send('Hello World from Dev1');
+  res.send('Hello world feature');
 });
 
 module.exports = app.listen(8080, () => {
